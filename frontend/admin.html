@@ -1,0 +1,3192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GSTMind — Admin Panel</title>
+<meta name="robots" content="noindex, nofollow"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  if(typeof pdfjsLib !== 'undefined'){
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1015;
+  --s1:#16181f;
+  --s2:#1c1f28;
+  --s3:#22263200;
+  --border:#2a2f3d;
+  --border2:#333847;
+  --accent:#c9a96e;
+  --accent2:#e8c98a;
+  --accent-bg:rgba(201,169,110,.08);
+  --accent-border:rgba(201,169,110,.25);
+  --green:#34d399;
+  --green-bg:rgba(52,211,153,.08);
+  --green-border:rgba(52,211,153,.2);
+  --red:#f87171;
+  --red-bg:rgba(248,113,113,.08);
+  --red-border:rgba(248,113,113,.2);
+  --blue:#60a5fa;
+  --blue-bg:rgba(96,165,250,.08);
+  --blue-border:rgba(96,165,250,.2);
+  --text:#e8e4dc;
+  --text2:#9a9488;
+  --text3:#5a5850;
+  --r:10px;
+}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+
+/* ── LOGIN ── */
+.login-wrap{
+  height:100vh;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+}
+.login-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:14px;padding:40px;width:380px;
+}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.login-logo-icon{
+  width:36px;height:36px;background:var(--accent);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:#0f1015;
+}
+.login-logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text)}
+.login-logo-tag{font-size:10px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+.login-title{font-size:22px;font-weight:600;margin-bottom:5px}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:600;margin-bottom:5px;display:block}
+.inp{
+  width:100%;background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:'DM Mono',monospace;
+  font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;
+  margin-bottom:14px;
+}
+.inp:focus{border-color:var(--accent)}
+.inp::placeholder{color:var(--text3)}
+.login-btn{
+  width:100%;padding:12px;background:var(--accent);color:#0f1015;
+  border:none;border-radius:8px;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;
+}
+.login-btn:hover{background:var(--accent2)}
+.login-err{
+  background:var(--red-bg);border:1px solid var(--red-border);
+  border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--red);
+  margin-bottom:14px;display:none;
+}
+.login-err.show{display:block}
+
+/* ── SHELL ── */
+.shell{display:flex;height:100vh;overflow:hidden;display:none}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--s1);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.brand{
+  padding:18px 16px 14px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.brand-icon{
+  width:32px;height:32px;background:var(--accent);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:#0f1015;
+}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text)}
+.brand-tag{font-size:9px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:1px}
+.brand-badge{
+  margin-left:auto;font-size:9px;padding:2px 8px;border-radius:10px;
+  background:var(--accent-bg);border:1px solid var(--accent-border);
+  color:var(--accent);font-family:'DM Mono',monospace;
+}
+
+.nav{padding:10px 10px 6px}
+.nav-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;padding:8px 6px 4px}
+.nav-btn{
+  width:100%;display:flex;align-items:center;gap:9px;
+  padding:9px 10px;border-radius:8px;background:none;border:none;
+  cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;
+  font-size:13px;transition:all .15s;text-align:left;margin-bottom:1px;
+}
+.nav-btn:hover{background:var(--s2);color:var(--text)}
+.nav-btn.active{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;opacity:.8}
+.nav-btn.active .nav-icon{opacity:1}
+.nav-count{
+  margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;
+  background:var(--s2);color:var(--text3);padding:1px 7px;border-radius:8px;
+}
+.nav-btn.active .nav-count{background:var(--accent-bg);color:var(--accent)}
+
+.sidebar-bottom{
+  margin-top:auto;border-top:1px solid var(--border);padding:10px;
+}
+.admin-info{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 10px;border-radius:8px;margin-bottom:4px;
+}
+.admin-av{
+  width:30px;height:30px;border-radius:50%;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#0f1015;flex-shrink:0;
+}
+.admin-name{font-size:12px;font-weight:500;color:var(--text)}
+.admin-role{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+.logout-btn{
+  width:100%;padding:8px 10px;background:none;border:1px solid var(--border);
+  border-radius:8px;color:var(--text3);font-size:12px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .15s;text-align:left;
+  display:flex;align-items:center;gap:8px;
+}
+.logout-btn:hover{border-color:var(--red-border);color:var(--red)}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+.topbar{
+  height:54px;flex-shrink:0;background:var(--s1);
+  border-bottom:1px solid var(--border);
+  padding:0 24px;display:flex;align-items:center;gap:14px;
+}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text3)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.status-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:20px;font-size:11px;
+  font-family:'DM Mono',monospace;
+}
+.status-online{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
+
+.content{flex:1;overflow-y:auto;padding:24px}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{
+  background:var(--s1);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px 20px;position:relative;overflow:hidden;
+  transition:border-color .2s;
+}
+.stat-card:hover{border-color:var(--border2)}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.stat-card.gold::before{background:var(--accent)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-card.red::before{background:var(--red)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px}
+.stat-value{font-size:30px;font-weight:600;font-family:'Cormorant Garamond',serif;color:var(--text);line-height:1}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:5px;font-family:'DM Mono',monospace}
+.stat-delta{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:11px;font-family:'DM Mono',monospace;margin-top:4px;
+}
+.delta-up{color:var(--green)}
+.delta-dn{color:var(--red)}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:14px;
+}
+.sec-title{font-size:15px;font-weight:600;color:var(--text)}
+.sec-sub{font-size:12px;color:var(--text3)}
+.sec-hdr-right{margin-left:auto;display:flex;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{
+  padding:7px 16px;border-radius:8px;font-size:13px;
+  font-family:'DM Sans',sans-serif;cursor:pointer;
+  font-weight:500;transition:all .15s;border:none;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{background:var(--accent);color:#0f1015}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--accent-border);color:var(--accent)}
+.btn-danger{background:transparent;border:1px solid var(--red-border);color:var(--red)}
+.btn-danger:hover{background:var(--red-bg)}
+.btn-success{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.btn-sm{padding:5px 11px;font-size:12px}
+
+/* ── TABLE ── */
+.table-wrap{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{
+  padding:11px 16px;text-align:left;font-size:11px;
+  text-transform:uppercase;letter-spacing:.08em;
+  color:var(--text3);font-weight:600;
+  border-bottom:1px solid var(--border);
+  background:var(--s2);
+}
+.tbl td{
+  padding:12px 16px;font-size:13px;color:var(--text2);
+  border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--s2)}
+.tbl td strong{color:var(--text);font-weight:500}
+
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:20px;font-size:11px;
+  font-family:'DM Mono',monospace;white-space:nowrap;
+}
+.badge-free{background:var(--s2);border:1px solid var(--border);color:var(--text3)}
+.badge-pro{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent)}
+.badge-unlimited{background:linear-gradient(135deg,rgba(201,169,110,.15),rgba(232,201,138,.15));border:1px solid var(--accent-border);color:var(--accent2)}
+.badge-active{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.badge-blocked{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── SEARCH / FILTER ── */
+.filter-bar{
+  display:flex;gap:10px;margin-bottom:14px;align-items:center;
+}
+.search-inp{
+  background:var(--s1);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;
+  padding:8px 12px;outline:none;transition:border-color .2s;width:240px;
+}
+.search-inp:focus{border-color:var(--accent-border)}
+.search-inp::placeholder{color:var(--text3)}
+.filter-sel{
+  background:var(--s1);border:1px solid var(--border);border-radius:8px;
+  color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;
+  padding:8px 12px;outline:none;cursor:pointer;
+}
+
+/* ── CARDS ── */
+.card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px;margin-bottom:14px;
+}
+.card-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.card-sub{font-size:12px;color:var(--text3);margin-bottom:16px;line-height:1.5}
+
+/* ── CHART BAR ── */
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-label{font-size:12px;color:var(--text2);width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .6s ease}
+.bar-count{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;width:36px;text-align:right;flex-shrink:0}
+
+/* ── KB ITEMS ── */
+.kb-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.kb-item:last-child{border-bottom:none}
+.kb-item:hover{background:var(--s2)}
+.kb-icon{
+  width:36px;height:36px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+  background:var(--accent-bg);border:1px solid var(--accent-border);
+}
+.kb-info{flex:1;min-width:0}
+.kb-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kb-meta{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px}
+
+/* ── MODAL ── */
+.modal-bg{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:200;
+  align-items:center;justify-content:center;
+  backdrop-filter:blur(3px);
+}
+.modal-bg.show{display:flex}
+.modal{
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:14px;padding:28px;width:440px;max-width:95vw;
+  box-shadow:0 24px 60px rgba(0,0,0,.4);
+}
+.modal-title{font-size:18px;font-weight:600;margin-bottom:5px}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.modal-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+
+/* ── FORM ── */
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{margin-bottom:14px}
+.fg label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:600;display:block;margin-bottom:5px}
+.fg input,.fg select,.fg textarea{
+  width:100%;background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:13px;padding:9px 12px;outline:none;transition:border-color .2s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent-border)}
+.fg textarea{resize:vertical;min-height:80px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.6}
+
+/* ── REVENUE CHART ── */
+.rev-chart{display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px}
+.rev-bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.rev-bar-fill{width:100%;background:var(--accent);border-radius:3px 3px 0 0;opacity:.8;transition:height .6s ease,opacity .2s}
+.rev-bar-fill:hover{opacity:1}
+.rev-bar-lbl{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace}
+
+/* ── TOAST ── */
+
+/* ── LIGHT MODE FOR ADMIN ── */
+body.light-mode {
+  --bg:#f5f3ef;
+  --s1:#ffffff;
+  --s2:#f0ede8;
+  --border:#e0d8cc;
+  --border2:#d0c8bc;
+  --accent:#b07030;
+  --accent-bg:rgba(176,112,48,.08);
+  --accent-border:rgba(176,112,48,.25);
+  --green:#166534;
+  --green-bg:rgba(22,101,52,.08);
+  --green-border:rgba(22,101,52,.2);
+  --red:#dc2626;
+  --red-bg:rgba(220,38,38,.08);
+  --red-border:rgba(220,38,38,.2);
+  --blue:#1d4ed8;
+  --blue-bg:rgba(29,78,216,.08);
+  --blue-border:rgba(29,78,216,.2);
+  --text:#1a1208;
+  --text2:#5a4030;
+  --text3:#8a7060;
+}
+body.light-mode .login-wrap{background:#f5f3ef}
+body.light-mode .login-card{background:#fff;border-color:#e0d8cc}
+body.light-mode .inp{background:#f0ede8;color:#1a1208;border-color:#e0d8cc}
+body.light-mode .sidebar{background:#fff}
+body.light-mode .brand{border-color:#e0d8cc}
+body.light-mode .nav-btn{color:#5a4030}
+body.light-mode .nav-btn:hover{background:#f0ede8}
+body.light-mode .main{background:#f5f3ef}
+body.light-mode .topbar{background:#fff;border-color:#e0d8cc}
+body.light-mode .content{background:#f5f3ef}
+body.light-mode .stat-card{background:#fff;border-color:#e0d8cc}
+body.light-mode .stat-value{color:#1a1208}
+body.light-mode .table-wrap{background:#fff;border-color:#e0d8cc}
+body.light-mode .tbl th{background:#f0ede8;color:#8a7060}
+body.light-mode .tbl td{color:#5a4030;border-color:#e0d8cc}
+body.light-mode .tbl tr:hover td{background:#f5f3ef}
+body.light-mode .card{background:#fff;border-color:#e0d8cc}
+body.light-mode .modal{background:#fff;border-color:#e0d8cc}
+body.light-mode .fg input,.light-mode .fg select,.light-mode .fg textarea{background:#f5f3ef;color:#1a1208;border-color:#e0d8cc}
+body.light-mode .search-inp,.light-mode .filter-sel{background:#fff;border-color:#e0d8cc;color:#1a1208}
+
+/* ADMIN THEME TOGGLE */
+.admin-theme-btn{
+  padding:6px 12px;border-radius:8px;font-size:12px;
+  background:none;border:1px solid var(--border);
+  color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all .15s;
+}
+.admin-theme-btn:hover{border-color:var(--accent-border);color:var(--accent)}
+
+
+/* ── DOCUMENT VIEWER ── */
+.doc-viewer-modal{
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:14px;padding:0;width:780px;max-width:96vw;
+  max-height:90vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 60px rgba(0,0,0,.4);
+}
+.doc-viewer-header{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.doc-viewer-title{font-size:15px;font-weight:600;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-viewer-meta{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;white-space:nowrap}
+.doc-viewer-body{
+  flex:1;overflow-y:auto;padding:20px;
+  font-family:'DM Mono',monospace;font-size:12px;
+  line-height:1.7;color:var(--text2);
+  white-space:pre-wrap;word-break:break-word;
+}
+.doc-viewer-body::-webkit-scrollbar{width:4px}
+.doc-viewer-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.doc-viewer-footer{
+  padding:12px 20px;border-top:1px solid var(--border);
+  display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;
+}
+
+
+/* ── KB TABS ── */
+.kb-tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--border);padding-bottom:0}
+.kb-tab{
+  padding:8px 16px;font-size:13px;font-weight:500;
+  background:none;border:none;cursor:pointer;
+  color:var(--text3);border-bottom:2px solid transparent;
+  font-family:'DM Sans',sans-serif;transition:all .2s;
+  display:flex;align-items:center;gap:6px;
+}
+.kb-tab:hover{color:var(--text)}
+.kb-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.kb-tab-count{
+  font-size:10px;padding:1px 7px;border-radius:10px;
+  background:var(--s2);color:var(--text3);
+  font-family:'DM Mono',monospace;
+}
+.kb-tab.active .kb-tab-count{background:var(--accent-bg);color:var(--accent)}
+
+/* ── SKIPPED DOCS ── */
+.skipped-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.skipped-item:hover{background:var(--s2)}
+.skipped-item:last-child{border-bottom:none}
+.skip-icon{
+  width:32px;height:32px;border-radius:8px;
+  background:rgba(248,113,113,.1);border:1px solid var(--red-border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.skip-info{flex:1;min-width:0}
+.skip-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skip-reason{font-size:11px;color:var(--red);margin-top:2px;font-family:'DM Mono',monospace}
+.skip-match{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* ── KB CATEGORIES ── */
+.kb-category{margin-bottom:8px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.kb-cat-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;background:var(--s2);cursor:pointer;
+  transition:background .15s;user-select:none;
+}
+.kb-cat-header:hover{background:var(--border)}
+.kb-cat-arrow{font-size:10px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.kb-cat-header.open .kb-cat-arrow{transform:rotate(90deg)}
+.kb-cat-name{font-size:13px;font-weight:600;color:var(--text)}
+.kb-cat-count{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:auto}
+.kb-cat-body{display:none}
+.kb-cat-body.open{display:block}
+.kb-year-group{border-top:1px solid var(--border)}
+.kb-year-header{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 14px 7px 28px;background:var(--s1);
+  cursor:pointer;font-size:12px;color:var(--text2);
+  font-family:'DM Mono',monospace;font-weight:500;
+  transition:background .15s;
+}
+.kb-year-header:hover{background:var(--s2)}
+.kb-year-docs{display:none;background:var(--bg)}
+.kb-year-docs.open{display:block}
+
+/* ── SELECT ALL ── */
+.select-all-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 16px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+  font-size:12px;color:var(--text2);
+}
+.select-all-row input[type=checkbox]{
+  width:15px;height:15px;cursor:pointer;accent-color:var(--accent);
+}
+
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:var(--s2);border:1px solid var(--border2);border-radius:8px;
+  padding:10px 16px;font-size:12.5px;color:var(--text);
+  opacity:0;transition:all .25s;pointer-events:none;z-index:999;
+  white-space:nowrap;font-family:'DM Mono',monospace;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.toast.show{opacity:1}
+.toast.success{border-color:var(--green-border);color:var(--green)}
+.toast.error{border-color:var(--red-border);color:var(--red)}
+
+/* ── NOTICE TAG ── */
+.empty-state{
+  text-align:center;padding:48px 20px;color:var(--text3);
+}
+.empty-state p{font-size:13px;margin-top:8px}
+
+/* GRID 2COL */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+</style>
+</head>
+<body>
+
+<!-- ════ ADMIN LOGIN ════ -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">G</div>
+      <div>
+        <div class="login-logo-name">GSTMind</div>
+        <div class="login-logo-tag">Admin Panel</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Email -->
+    <div id="adminStep1">
+      <div class="login-title">Admin Login</div>
+      <div class="login-sub">Enter your admin email to receive a one-time password.</div>
+      <div class="login-err" id="loginErr" style="display:none">Error. Please try again.</div>
+      <label class="lbl">Admin Email</label>
+      <input class="inp" type="email" id="adminEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')adminSendOTP()"/>
+      <button class="login-btn" onclick="adminSendOTP()" id="adminSendBtn">Send OTP →</button>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid #e5e0d8;text-align:center">
+        <span style="font-size:12px;color:#999">First time? </span>
+        <span style="font-size:12px;color:#c9a96e;cursor:pointer;font-weight:500" onclick="showAdminSignup()">Create admin account</span>
+      </div>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div id="adminStep2" style="display:none">
+      <div class="login-title">Enter OTP</div>
+      <div class="login-sub">6-digit code sent to <strong id="adminEmailShow"></strong></div>
+      <div class="login-err" id="loginOTPErr" style="display:none">Invalid OTP.</div>
+      <div style="display:flex;gap:8px;margin:16px 0">
+        <input class="inp" type="tel" maxlength="1" id="ao1" oninput="adminOTPInput(this)" style="text-align:center;font-size:20px;padding:10px;flex:1"/>
+        <input class="inp" type="tel" maxlength="1" id="ao2" oninput="adminOTPInput(this)" style="text-align:center;font-size:20px;padding:10px;flex:1"/>
+        <input class="inp" type="tel" maxlength="1" id="ao3" oninput="adminOTPInput(this)" style="text-align:center;font-size:20px;padding:10px;flex:1"/>
+        <input class="inp" type="tel" maxlength="1" id="ao4" oninput="adminOTPInput(this)" style="text-align:center;font-size:20px;padding:10px;flex:1"/>
+        <input class="inp" type="tel" maxlength="1" id="ao5" oninput="adminOTPInput(this)" style="text-align:center;font-size:20px;padding:10px;flex:1"/>
+        <input class="inp" type="tel" maxlength="1" id="ao6" oninput="adminOTPInput(this)" style="text-align:center;font-size:20px;padding:10px;flex:1"/>
+      </div>
+      <button class="login-btn" onclick="adminVerifyOTP()" id="adminVerifyBtn">Verify & Login</button>
+      <div style="text-align:center;margin-top:10px;font-size:12px">
+        <span style="color:#c9a96e;cursor:pointer" onclick="showAdminStep1()">← Back</span>
+        &nbsp;·&nbsp;
+        <span style="color:#c9a96e;cursor:pointer" onclick="adminSendOTP()">Resend OTP</span>
+      </div>
+    </div>
+
+    <!-- Signup -->
+    <div id="adminSignup" style="display:none">
+      <div class="login-title">Create Admin Account</div>
+      <div class="login-sub">One-time setup. Requires invite code.</div>
+      <div class="login-err" id="signupErr" style="display:none">Error.</div>
+      <label class="lbl">First Name</label>
+      <input class="inp" type="text" id="adminFname" placeholder="First name"/>
+      <label class="lbl">Last Name</label>
+      <input class="inp" type="text" id="adminLname" placeholder="Last name"/>
+      <label class="lbl">Email</label>
+      <input class="inp" type="email" id="adminSignupEmail" placeholder="your@email.com"/>
+      <label class="lbl">Invite Code</label>
+      <input class="inp" type="text" id="adminInviteCode" placeholder="Get from GSTMind support"/>
+      <button class="login-btn" onclick="adminDoSignup()" id="adminSignupBtn">Create Account & Send OTP</button>
+      <div style="text-align:center;margin-top:10px">
+        <span style="font-size:12px;color:#c9a96e;cursor:pointer" onclick="showAdminStep1()">← Back to login</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADMIN SHELL<!-- ════ ADMIN SHELL ════ -->
+<div class="shell" id="adminShell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">G</div>
+      <div>
+        <div class="brand-name">GSTMind</div>
+        <div class="brand-tag">Admin Panel</div>
+      </div>
+      <div class="brand-badge">ADMIN</div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-lbl">Overview</div>
+      <button class="nav-btn active" onclick="showPanel('dashboard',this)">
+        <span class="nav-icon">◼</span> Dashboard
+      </button>
+
+      <div class="nav-lbl">Management</div>
+      <button class="nav-btn" onclick="showPanel('users',this)">
+        <span class="nav-icon">◻</span> Users
+        <span class="nav-count" id="nav-user-count">0</span>
+      </button>
+      <button class="nav-btn" onclick="showPanel('kb',this)">
+        <span class="nav-icon">◻</span> Knowledge Base
+        <span class="nav-count" id="nav-kb-count">6</span>
+      </button>
+      <button class="nav-btn" onclick="showPanel('analytics',this)">
+        <span class="nav-icon">◻</span> Analytics
+      </button>
+      <button class="nav-btn" onclick="showPanel('subscriptions',this)">
+        <span class="nav-icon">◻</span> Subscriptions
+      </button>
+
+      <div class="nav-lbl">System</div>
+      <button class="nav-btn" onclick="showPanel('settings',this)">
+        <span class="nav-icon">◻</span> Settings
+      </button>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="admin-info">
+        <div class="admin-av">A</div>
+        <div>
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">Super Admin</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="adminLogout()">
+        <span>↩</span> Log out
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-sub" id="topbarSub">Overview of GSTMind platform</div>
+        <div id="kbVerifyStats" style="font-size:11px;color:var(--accent);font-weight:500;margin-left:8px;display:none"></div>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill status-online" id="systemStatusPill" title="Click to check sync"><div class="status-dot" id="systemStatusDot"></div><span id="systemStatusText">Checking...</span></div>
+        <div id="kbSyncPill" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-family:monospace;background:#f0fdf4;border:1px solid #86efac;color:#166534;cursor:pointer" onclick="checkKBSync()" title="Click to refresh sync status">
+          <div id="kbSyncDot" style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+          <span id="kbSyncText">KB Sync: Checking...</span>
+        </div>
+<button class="admin-theme-btn" id="adminThemeBtn" onclick="toggleAdminTheme()">☀️ Light</button>
+        <button class="btn btn-ghost btn-sm" onclick="refreshData()">↺ Refresh</button>
+      <button class="btn btn-sm" style="background:var(--accent);color:#fff;font-size:11px" onclick="uploadAllLocal()" id="uploadAllBtn">↑ Sync Local → Server</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleUploadLog()" id="uploadLogBtn">📋 Upload Log</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card gold">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" id="stat-total-users">0</div>
+            <div class="stat-sub">All registered accounts</div>
+            <div class="stat-delta delta-up" id="stat-users-delta">↑ 0 this week</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Paid Subscribers</div>
+            <div class="stat-value" id="stat-paid">0</div>
+            <div class="stat-sub">Pro + Unlimited plans</div>
+            <div class="stat-delta delta-up" id="stat-paid-delta">↑ 0 this month</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Queries This Month</div>
+            <div class="stat-value" id="stat-queries">0</div>
+            <div class="stat-sub">Total across all users</div>
+            <div class="stat-delta" id="stat-query-delta" style="color:var(--text3)">All time: 0</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">Est. Monthly Revenue</div>
+            <div class="stat-value" id="stat-revenue">₹0</div>
+            <div class="stat-sub">Based on active plans</div>
+            <div class="stat-delta delta-up" id="stat-rev-delta">↑ ₹0 projected</div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <!-- Recent signups -->
+          <div class="card">
+            <div class="card-title">Recent Signups</div>
+            <div class="card-sub">Last 5 users who joined GSTMind</div>
+            <div id="recent-signups">
+              <div class="empty-state"><p>No users yet</p></div>
+            </div>
+          </div>
+
+          <!-- Revenue chart -->
+          <div class="card">
+            <div class="card-title">Revenue Overview</div>
+            <div class="card-sub">Estimated monthly revenue by plan</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+              <div class="bar-row">
+                <span class="bar-label">Free Trial</span>
+                <div class="bar-track"><div class="bar-fill" id="rev-bar-free" style="width:0%;background:var(--text3)"></div></div>
+                <span class="bar-count" id="rev-cnt-free">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Professional (₹999)</span>
+                <div class="bar-track"><div class="bar-fill" id="rev-bar-pro" style="width:0%"></div></div>
+                <span class="bar-count" id="rev-cnt-pro">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Unlimited (₹1,999)</span>
+                <div class="bar-track"><div class="bar-fill" id="rev-bar-unlimited" style="width:0%;background:var(--accent2)"></div></div>
+                <span class="bar-count" id="rev-cnt-unlimited">0</span>
+              </div>
+            </div>
+            <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:var(--text3)">
+              API cost estimate: <span style="color:var(--text);font-family:'DM Mono',monospace" id="api-cost-est">₹0/month</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top queries preview -->
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div class="card-title">Top Queries</div>
+            <span style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3)" id="query-log-count">0 unique questions</span>
+          </div>
+          <div class="card-sub">Most frequently asked by users — anonymised, updated in real time</div>
+          <div class="bar-chart" id="top-queries-dash" style="margin-top:12px">
+            <div class="empty-state" style="padding:20px"><p>No queries recorded yet.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── USERS ── -->
+      <div class="panel" id="panel-users">
+        <div class="filter-bar">
+          <input class="search-inp" type="text" placeholder="Search by name, email or phone..." oninput="filterUsers(this.value)" id="userSearch"/>
+          <select class="filter-sel" onchange="filterUsers()" id="planFilter">
+            <option value="">All Plans</option>
+            <option value="free">Free Trial</option>
+            <option value="pro">Professional</option>
+            <option value="unlimited">Unlimited</option>
+          </select>
+          <select class="filter-sel" onchange="filterUsers()" id="statusFilter">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="blocked">Blocked</option>
+          </select>
+          <div class="sec-hdr-right" style="margin-left:auto">
+            <button class="btn btn-ghost btn-sm" onclick="exportUsers()">↓ Export CSV</button>
+            <button class="btn btn-primary btn-sm" onclick="showAddUser()">+ Add User</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Contact</th>
+                <th>Profession</th>
+                <th>Plan</th>
+                <th>Queries</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <tr><td colspan="8"><div class="empty-state"><p>No users yet. Users will appear here once they sign up.</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── KNOWLEDGE BASE ── -->
+      <div class="panel" id="panel-kb">
+        <div class="grid2">
+          <!-- Add document -->
+          <!-- Add document -->
+          <div class="card">
+            <div class="card-title">Add Documents</div>
+            <div class="card-sub">Upload files or folders. Name, type &amp; date auto-detected from document content.</div>
+            <input type="file" id="kb-file-inp" accept=".pdf,.txt" multiple style="display:none" onchange="kbHandleFiles(this.files)"/>
+            <input type="file" id="kb-folder-inp" accept=".pdf,.txt" multiple webkitdirectory style="display:none" onchange="kbHandleFiles(this.files)"/>
+            <div id="kbDropZone" style="border:2px dashed var(--border2);border-radius:10px;padding:24px;text-align:center;margin-bottom:12px;cursor:default;transition:all .2s"
+              ondragover="event.preventDefault();document.getElementById('kbDropZone').style.borderColor='var(--accent)';document.getElementById('kbDropZone').style.background='var(--accent-bg)'"
+              ondragleave="document.getElementById('kbDropZone').style.borderColor='';document.getElementById('kbDropZone').style.background=''"
+              ondrop="document.getElementById('kbDropZone').style.borderColor='';document.getElementById('kbDropZone').style.background='';kbOnDrop(event)">
+              <div style="font-size:28px;margin-bottom:6px">📂</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Drag &amp; drop files or folder here</div>
+              <div style="font-size:11px;color:var(--text2)">Supports PDF and TXT files · Folders supported</div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:12px">
+              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('kb-file-inp').click()" style="flex:1">📄 Select Files</button>
+              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('kb-folder-inp').click()" style="flex:1">📁 Select Folder</button>
+            </div>
+            <div id="kbProgress" style="display:none;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span id="kbProgTitle" style="font-size:13px;font-weight:600;color:var(--text)">Processing...</span>
+                <span id="kbProgCount" style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)">0 / 0</span>
+              </div>
+              <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:8px">
+                <div id="kbProgBar" style="height:100%;background:var(--accent);border-radius:4px;width:0%;transition:width .3s"></div>
+              </div>
+              <div id="kbProgFile" style="font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px"></div>
+              <div id="kbProgStats" style="font-size:11px;color:var(--green)"></div>
+            </div>
+            <hr class="hr" style="margin:12px 0"/>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:600;margin-bottom:10px">Or paste text manually</div>
+            <div class="fg"><label>Document Name</label><input type="text" id="kb-doc-name" placeholder="Auto-filled when file is uploaded"/></div>
+            <div class="fg"><label>Document Type</label>
+              <select id="kb-doc-type">
+                <option>CBIC Circular</option><option>CBIC Notification</option><option>GST Act Section</option>
+                <option>GST Rules</option><option>AAR/AAAR Order</option><option>CBIC FAQ</option><option>Other</option>
+              </select>
+            </div>
+            <div class="fg"><label>Document Text</label><textarea id="kb-doc-text" placeholder="Paste full document text here..."></textarea></div>
+            <button class="btn btn-primary" onclick="addKBDocument()" style="width:100%">Add to Knowledge Base</button>
+          </div>
+
+          <!-- Auto-sync -->
+          <div class="card">
+            <div class="card-title">CBIC Auto-Sync</div>
+            <div class="card-sub">Automatically fetches new circulars and notifications from cbic.gov.in</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+              <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--text3)">Last sync</span>
+                <span style="font-family:'DM Mono',monospace;color:var(--text2)" id="last-sync">Never</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--text3)">Documents added</span>
+                <span style="font-family:'DM Mono',monospace;color:var(--green)" id="sync-docs-added">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--text3)">Next scheduled sync</span>
+                <span style="font-family:'DM Mono',monospace;color:var(--text2)">Daily 6:00 AM IST</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--text3)">Status</span>
+                <span class="badge badge-active"><span class="badge-dot"></span>Configured</span>
+              </div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%" onclick="triggerSync()">↺ Trigger Manual Sync Now</button>
+            <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Auto-sync requires the backend server to be running. In the prototype, use manual upload above.</div>
+          </div>
+        </div>
+
+        <!-- Document list -->
+        <div class="sec-hdr">
+          <div class="sec-title">Knowledge Base Documents</div>
+          <div class="sec-sub" id="kb-count-label">6 built-in documents</div>
+          <div class="sec-hdr-right">
+            <input class="search-inp" type="text" placeholder="Search documents..." oninput="filterKB(this.value)" id="kbSearch" style="width:180px"/>
+            <button class="btn btn-ghost btn-sm" onclick="downloadKBZip()">⬇ Download KB Zip</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteSelectedDocs()" id="deleteSelectedBtn" style="display:none">🗑 Delete Selected</button>
+          </div>
+        </div>
+
+        <!-- KB TABS -->
+        <div class="kb-tabs">
+          <button class="kb-tab active" id="kbTab-all" onclick="switchKBTab('all',this)">
+            All Documents <span class="kb-tab-count" id="kbTabCount-all">0</span>
+          </button>
+          <button class="kb-tab" id="kbTab-cat" onclick="switchKBTab('cat',this)">
+            By Category <span class="kb-tab-count" id="kbTabCount-cat">0</span>
+          </button>
+          <button class="kb-tab" id="kbTab-skipped" onclick="switchKBTab('skipped',this)">
+            ⚠ Skipped <span class="kb-tab-count" id="kbTabCount-skipped" style="background:var(--red-bg);color:var(--red)">0</span>
+          </button>
+        </div>
+
+        <!-- ALL DOCS TAB -->
+      <!-- Upload Log Panel -->
+      <div id="uploadLogPanel" style="display:none;margin-bottom:16px;border:1px solid #333;border-radius:10px;overflow:hidden">
+        <div style="background:var(--surface);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">📋 Upload Activity Log</div>
+          <button class="btn btn-ghost btn-sm" onclick="clearUploadLog()">Clear</button>
+        </div>
+        <div id="uploadLogEntries" style="max-height:280px;overflow-y:auto;font-family:monospace;font-size:11px;padding:8px 12px;background:#111;color:#e0e0e0">
+          <div style="color:#666">No upload activity yet.</div>
+        </div>
+      </div>
+        <div id="kbView-all" class="table-wrap">
+          <div class="select-all-row">
+            <input type="checkbox" id="selectAllChk" onchange="toggleSelectAll(this.checked)" title="Select all"/>
+            <span>Select all</span>
+          </div>
+          <div id="kbDocList"></div>
+        </div>
+
+        <!-- BY CATEGORY TAB -->
+        <div id="kbView-cat" style="display:none">
+          <div id="kbCatList"></div>
+        </div>
+
+        <!-- SKIPPED TAB -->
+        <div id="kbView-skipped" style="display:none">
+          <div style="padding:10px 16px;background:var(--red-bg);border:1px solid var(--red-border);border-radius:8px;margin-bottom:12px;font-size:12.5px;color:var(--red)">
+            These documents were skipped during upload because they appeared to be duplicates. You can review each one and add it manually if needed.
+          <button class="btn btn-ghost btn-sm" onclick="clearAllSkipped()" style="float:right;margin-top:-2px">Clear All</button>
+          </div>
+          <div class="table-wrap">
+            <div id="kbSkippedList">
+              <div class="empty-state"><p>No skipped documents. All uploaded files were processed successfully.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ANALYTICS ── -->
+      <div class="panel" id="panel-analytics">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title">Query Mode Distribution</div>
+            <div class="card-sub">Breakdown of query vs notice draft usage</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+              <div class="bar-row">
+                <span class="bar-label">GST Query</span>
+                <div class="bar-track"><div class="bar-fill" style="width:72%"></div></div>
+                <span class="bar-count" style="color:var(--text2)">72%</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Notice Draft</span>
+                <div class="bar-track"><div class="bar-fill" style="width:28%;background:var(--blue)"></div></div>
+                <span class="bar-count" style="color:var(--text2)">28%</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">User Plan Conversion</div>
+            <div class="card-sub">Free trial to paid conversion funnel</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+              <div class="bar-row">
+                <span class="bar-label">Signed up (free trial)</span>
+                <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--text3)"></div></div>
+                <span class="bar-count" id="an-free-cnt" style="color:var(--text2)">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Used 5+ queries</span>
+                <div class="bar-track"><div class="bar-fill" style="width:60%"></div></div>
+                <span class="bar-count" style="color:var(--text2)">—</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Converted to paid</span>
+                <div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--green)"></div></div>
+                <span class="bar-count" id="an-paid-cnt" style="color:var(--green)">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-hdr"><div class="sec-title">Top Questions Asked</div><div class="sec-sub">Most frequent queries across all users — anonymised</div></div>
+        <div class="card">
+          <div class="bar-chart" id="top-queries-full">
+            <div class="empty-state"><p>No query data yet. Questions will appear here as users interact with GSTMind.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SUBSCRIPTIONS ── -->
+      <div class="panel" id="panel-subscriptions">
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card gold">
+            <div class="stat-label">Monthly Recurring Revenue</div>
+            <div class="stat-value" id="sub-mrr">₹0</div>
+            <div class="stat-sub">Pro + Unlimited subscribers</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Active Paid Subscribers</div>
+            <div class="stat-value" id="sub-active">0</div>
+            <div class="stat-sub">Billing this month</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Trial Users</div>
+            <div class="stat-value" id="sub-trial">0</div>
+            <div class="stat-sub">Potential conversions</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Plan Settings</div>
+          <div class="card-sub">Adjust query limits and pricing for each subscription tier.</div>
+          <table class="tbl" style="margin-top:0">
+            <thead><tr><th>Plan</th><th>Price</th><th>Query Limit / Month</th><th>Active Users</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Free Trial</strong></td>
+                <td>₹0</td>
+                <td><input type="number" value="10" style="background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 9px;width:80px;font-family:'DM Mono',monospace;font-size:13px;outline:none" id="limit-free"/></td>
+                <td id="plan-cnt-free" style="font-family:'DM Mono',monospace">0</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="savePlanLimit('free')">Save</button></td>
+              </tr>
+              <tr>
+                <td><strong>Professional</strong></td>
+                <td>₹999/mo</td>
+                <td><input type="number" value="100" style="background:var(--s2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 9px;width:80px;font-family:'DM Mono',monospace;font-size:13px;outline:none" id="limit-pro"/></td>
+                <td id="plan-cnt-pro" style="font-family:'DM Mono',monospace">0</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="savePlanLimit('pro')">Save</button></td>
+              </tr>
+              <tr>
+                <td><strong>Unlimited</strong></td>
+                <td>₹1,999/mo</td>
+                <td><span style="font-family:'DM Mono',monospace;color:var(--green)">∞ Unlimited</span></td>
+                <td id="plan-cnt-unlimited" style="font-family:'DM Mono',monospace">0</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sec-hdr"><div class="sec-title">All Subscriptions</div></div>
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead><tr><th>User</th><th>Plan</th><th>Queries Used</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="subTableBody">
+              <tr><td colspan="6"><div class="empty-state"><p>No subscribers yet.</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="panel" id="panel-settings">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-title">Admin Credentials</div>
+            <div class="card-sub">Change your admin login password.</div>
+            <div class="fg"><label>Current Password</label><input type="password" id="stg-curr-pass" placeholder="Current password"/></div>
+            <div class="fg"><label>New Password</label><input type="password" id="stg-new-pass" placeholder="New password (min 8 chars)"/></div>
+            <div class="fg"><label>Confirm New Password</label><input type="password" id="stg-conf-pass" placeholder="Confirm new password"/></div>
+            <button class="btn btn-primary" onclick="changeAdminPass()">Update Password</button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Master API Key</div>
+            <div class="card-sub">Your Claude API key. This powers all user queries. Keep it private — never share this with users.</div>
+            <div class="fg">
+              <label>Claude API Key</label>
+              <input type="password" id="stg-master-key" placeholder="sk-ant-api03-..." oninput="saveMasterKey(this.value)"/>
+            </div>
+            <div style="font-size:11px;color:var(--text3);line-height:1.6;margin-top:-8px">
+              Get your key at console.anthropic.com → API Keys.<br/>
+              Estimated cost: ₹0.75–₹1.25 per query.
+            </div>
+            <div style="margin-top:12px;padding:10px 12px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;font-size:12px;color:var(--green)" id="api-key-status">
+              Status: No key set
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Disclaimer Text</div>
+          <div class="card-sub">This text appears at the bottom of every GSTMind answer.</div>
+          <div class="fg">
+            <textarea id="stg-disclaimer" style="min-height:60px">This response is generated by GSTMind AI for research and reference purposes only. It does not constitute legal or professional advice. Users must verify all information with primary legislation before taking any action.</textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="saveDisclaimer()">Save Disclaimer</button>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="card-title">AI Instructions — GST Query Mode</div>
+          <div class="card-sub">Controls how GSTMind responds to GST research queries. Changes take effect immediately for all users.</div>
+          <div class="fg" style="margin-top:10px">
+            <textarea id="stg-prompt-query" style="min-height:180px;font-size:11px;line-height:1.6"></textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="savePrompt('query')">Save Query Instructions</button>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="card-title">AI Instructions — Notice Draft Mode</div>
+          <div class="card-sub">Controls how GSTMind drafts replies to GST notices. Changes take effect immediately.</div>
+          <div class="fg" style="margin-top:10px">
+            <textarea id="stg-prompt-draft" style="min-height:180px;font-size:11px;line-height:1.6"></textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="savePrompt('draft')">Save Draft Instructions</button>
+        </div>
+
+        <div class="card" style="border-color:var(--red-border)">
+          <div class="card-title" style="color:var(--red)">Danger Zone</div>
+          <div class="card-sub">These actions are irreversible. Use with extreme caution.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-danger" onclick="confirmAction('Reset all query counts to zero?',()=>{resetQueryCounts();showToast('All query counts reset','success')})">Reset All Query Counts</button>
+            <button class="btn btn-danger" onclick="confirmAction('Clear ALL user data? This cannot be undone.',()=>{clearAllUsers();showToast('All user data cleared','error')})">Clear All User Data</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- DOCUMENT VIEWER MODAL -->
+<div class="modal-bg" id="docViewerModal" onclick="if(event.target===this)closeDocViewer()">
+  <div class="doc-viewer-modal">
+    <div class="doc-viewer-header">
+      <div>
+        <div class="doc-viewer-title" id="dvTitle">Document</div>
+        <div class="doc-viewer-meta" id="dvMeta"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closeDocViewer()">✕ Close</button>
+    </div>
+    <div class="doc-viewer-body" id="dvBody">Loading...</div>
+    <div class="doc-viewer-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeDocViewer()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD USER MODAL -->
+<div class="modal-bg" id="addUserModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Add New User</div>
+    <div class="modal-sub">Manually create a user account. They can log in with these credentials.</div>
+    <div class="form-row2">
+      <div class="fg"><label>First Name</label><input type="text" id="au-fname" placeholder="Rajesh"/></div>
+      <div class="fg"><label>Last Name</label><input type="text" id="au-lname" placeholder="Kumar"/></div>
+    </div>
+    <div class="fg"><label>Email</label><input type="email" id="au-email" placeholder="rajesh@example.com"/></div>
+    <div class="fg"><label>Mobile (optional)</label><input type="tel" id="au-phone" placeholder="9876543210"/></div>
+    <div class="fg"><label>Password</label><input type="password" id="au-pass" placeholder="Set a password"/></div>
+    <div class="form-row2">
+      <div class="fg">
+        <label>Plan</label>
+        <select id="au-plan">
+          <option value="free">Free Trial</option>
+          <option value="pro">Professional</option>
+          <option value="unlimited">Unlimited</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Profession</label>
+        <select id="au-prof">
+          <option>Chartered Accountant</option>
+          <option>Tax Consultant</option>
+          <option>Advocate / Tax Lawyer</option>
+          <option>Company Secretary</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('addUserModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="addUserManually()">Create User</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHANGE PLAN MODAL -->
+<div class="modal-bg" id="changePlanModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Change User Plan</div>
+    <div class="modal-sub" id="cpm-user-name">User: —</div>
+    <div class="fg">
+      <label>New Plan</label>
+      <select id="cpm-plan">
+        <option value="free">Free Trial</option>
+        <option value="pro">Professional (₹999/mo)</option>
+        <option value="unlimited">Unlimited (₹1,999/mo)</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Query Limit Override (optional)</label>
+      <input type="number" id="cpm-limit" placeholder="Leave blank to use plan default"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('changePlanModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveChangePlan()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-bg" id="confirmModal" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div class="modal-title">Confirm Action</div>
+    <div class="modal-sub" id="confirm-msg">Are you sure?</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('confirmModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════
+// ADMIN AUTH
+// ════════════════════════════════
+const ADMIN_CREDS = {user:'admin', pass:''}; // Legacy — replaced by OTP
+const API = 'https://web-production-399b0.up.railway.app';
+// Admin Railway token — stored after admin logs in via API
+let adminApiToken = localStorage.getItem('gm_admin_api_token') || '';
+
+// Get/refresh API token for KB operations
+async function ensureApiToken(){
+  // Use existing token if available
+  if(adminApiToken) return adminApiToken;
+  
+  // Try stored token from previous session
+  const stored = localStorage.getItem('gm_admin_api_token');
+  if(stored){ adminApiToken = stored; return adminApiToken; }
+  
+  // No token — show helpful message instead of browser prompt
+  showToast('Please log out and log back in with your GSTMind email to enable server uploads','error');
+  return null;
+}
+// adminPass removed — auth now via OTP
+
+// ════════════════════════════════
+// ADMIN AUTH — Email OTP
+// ════════════════════════════════
+let adminEmail = localStorage.getItem('gm_admin_email') || '';
+let lastSyncTime = null;
+let syncCheckInterval = null;
+
+function showAdminStep1(){
+  document.getElementById('adminStep1').style.display='block';
+  document.getElementById('adminStep2').style.display='none';
+  document.getElementById('adminSignup').style.display='none';
+}
+function showAdminSignup(){
+  document.getElementById('adminStep1').style.display='none';
+  document.getElementById('adminStep2').style.display='none';
+  document.getElementById('adminSignup').style.display='block';
+}
+function adminOTPInput(el){
+  el.value = el.value.replace(/\D/g,'');
+  const inputs = ['ao1','ao2','ao3','ao4','ao5','ao6'].map(id=>document.getElementById(id));
+  const idx = inputs.indexOf(el);
+  if(el.value && idx < 5) inputs[idx+1].focus();
+  if(inputs.every(i=>i.value)) adminVerifyOTP();
+}
+function getAdminOTP(){
+  return ['ao1','ao2','ao3','ao4','ao5','ao6'].map(id=>document.getElementById(id).value).join('');
+}
+async function adminSendOTP(){
+  const email = document.getElementById('adminEmail').value.trim();
+  if(!email||!email.includes('@')){ showErr('loginErr','Please enter a valid email'); return; }
+  const btn = document.getElementById('adminSendBtn');
+  btn.textContent='Sending...'; btn.disabled=true;
+  hideErr('loginErr');
+  try{
+    const res = await fetch(API+'/auth/admin/otp/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail||'Failed');
+    adminEmail = email;
+    localStorage.setItem('gm_admin_email', email);
+    document.getElementById('adminEmailShow').textContent = email;
+    document.getElementById('adminStep1').style.display='none';
+    document.getElementById('adminStep2').style.display='block';
+    ['ao1','ao2','ao3','ao4','ao5','ao6'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ao1').focus();
+    if(data.dev_otp){ showToast('Dev OTP: '+data.dev_otp,'info'); }
+  }catch(e){ showErr('loginErr', e.message); }
+  finally{ btn.textContent='Send OTP →'; btn.disabled=false; }
+}
+async function adminVerifyOTP(){
+  const otp = getAdminOTP();
+  if(otp.length!==6) return;
+  const btn = document.getElementById('adminVerifyBtn');
+  btn.textContent='Verifying...'; btn.disabled=true;
+  hideErr('loginOTPErr');
+  try{
+    const res = await fetch(API+'/auth/admin/otp/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:adminEmail,otp})});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.detail||'Invalid OTP');
+    adminApiToken = data.token;
+    localStorage.setItem('gm_admin_api_token', adminApiToken);
+    localStorage.setItem('gm_admin_session','1');
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('adminShell').style.display='flex';
+    initAdmin();
+  }catch(e){
+    showErr('loginOTPErr', e.message);
+    ['ao1','ao2','ao3','ao4','ao5','ao6'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ao1').focus();
+  }
+  finally{ btn.textContent='Verify & Login'; btn.disabled=false; }
+}
+async function adminDoSignup(){
+  const fname=document.getElementById('adminFname').value.trim();
+  const lname=document.getElementById('adminLname').value.trim();
+  const email=document.getElementById('adminSignupEmail').value.trim();
+  const invite=document.getElementById('adminInviteCode').value.trim();
+  if(!fname||!lname||!email||!invite){ showErr('signupErr','Please fill all fields'); return; }
+  const btn=document.getElementById('adminSignupBtn');
+  btn.textContent='Creating...'; btn.disabled=true;
+  hideErr('signupErr');
+  try{
+    const res=await fetch(API+'/auth/admin/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fname,lname,email,invite_code:invite})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.detail||'Signup failed');
+    adminEmail=email;
+    localStorage.setItem('gm_admin_email',email);
+    document.getElementById('adminEmail').value=email;
+    document.getElementById('adminEmailShow').textContent=email;
+    document.getElementById('adminSignup').style.display='none';
+    document.getElementById('adminStep2').style.display='block';
+    ['ao1','ao2','ao3','ao4','ao5','ao6'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ao1').focus();
+    if(data.dev_otp){ showToast('Dev OTP: '+data.dev_otp,'info'); }
+    else showToast('Account created! Check your email for OTP.','success');
+  }catch(e){ showErr('signupErr',e.message); }
+  finally{ btn.textContent='Create Account & Send OTP'; btn.disabled=false; }
+}
+function showErr(id,msg){ const el=document.getElementById(id); if(el){el.textContent=msg;el.style.display='block';} }
+function hideErr(id){ const el=document.getElementById(id); if(el)el.style.display='none'; }
+async function ensureApiToken(){
+  if(adminApiToken) return adminApiToken;
+  const stored=localStorage.getItem('gm_admin_api_token');
+  if(stored){ adminApiToken=stored; return adminApiToken; }
+  showToast('Session expired — please log in again','error');
+  adminLogout();
+  return null;
+}
+function adminLogout(){
+  stopSyncMonitor();
+  adminApiToken='';
+  localStorage.removeItem('gm_admin_session');
+  localStorage.removeItem('gm_admin_api_token');
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('adminShell').style.display='none';
+  showAdminStep1();
+}
+
+// adminPass removed — auth now via OTP
+
+async function adminLogin(){
+  const u = document.getElementById('adminUser').value.trim();
+  const p = document.getElementById('adminPass').value;
+  const err = document.getElementById('loginErr');
+  const btn = document.querySelector('.login-btn');
+  
+  // Local admin check
+  const isLocalAdmin = (u === ADMIN_CREDS.user && p === adminPass);
+  const isEmailLogin = u.includes('@');
+  
+  if(!isLocalAdmin && !isEmailLogin){ err.classList.add('show'); return; }
+  
+  if(btn){ btn.textContent='Logging in...'; btn.disabled=true; }
+  
+  try{
+    // Always try Railway auth to get API token for Supabase uploads
+    const loginEmail = isEmailLogin ? u : (localStorage.getItem('gm_admin_email')||'');
+    const loginPass = p;
+    
+    if(loginEmail){
+      try{
+        const res = await fetch(API+'/auth/login/email',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({email:loginEmail, password:loginPass})
+        });
+        const data = await res.json();
+        if(data.token){
+          adminApiToken = data.token;
+          localStorage.setItem('gm_admin_api_token', adminApiToken);
+          localStorage.setItem('gm_admin_email', loginEmail);
+          console.log('Railway auth: OK');
+        }
+      }catch(e){ console.log('Railway auth failed (will work offline):', e.message); }
+    }
+    
+    // Allow access if local credentials match OR Railway auth succeeded
+    if(isLocalAdmin || (isEmailLogin && adminApiToken)){
+      err.classList.remove('show');
+      localStorage.setItem('gm_admin_session','1');
+      document.getElementById('loginWrap').style.display='none';
+      document.getElementById('adminShell').style.display='flex';
+      initAdmin();
+    } else {
+      err.classList.add('show');
+    }
+  } finally {
+    if(btn){ btn.textContent='Access Admin Panel'; btn.disabled=false; }
+  }
+}
+
+function adminLogout(){
+  localStorage.removeItem('gm_admin_session');
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('adminShell').style.display='none';
+}
+
+// Auto-login if session exists
+window.onload = async () => {
+  const token = localStorage.getItem('gm_admin_api_token');
+  const session = localStorage.getItem('gm_admin_session');
+  if(token && session==='1'){
+    try{
+      const res = await fetch(API+'/auth/admin/me',{headers:{'Authorization':'Bearer '+token}});
+      if(res.ok){
+        adminApiToken = token;
+        document.getElementById('loginWrap').style.display='none';
+        document.getElementById('adminShell').style.display='flex';
+        initAdmin();
+        return;
+      }
+    }catch(e){}
+    localStorage.removeItem('gm_admin_session');
+    localStorage.removeItem('gm_admin_api_token');
+  }
+  const savedEmail = localStorage.getItem('gm_admin_email');
+  if(savedEmail && document.getElementById('adminEmail'))
+    document.getElementById('adminEmail').value = savedEmail;
+  const mk = localStorage.getItem('gm_master_key')||'';
+  const mkEl = document.getElementById('stg-master-key');
+  if(mk && mkEl) mkEl.value = mk;
+  if(typeof updateApiKeyStatus === 'function') updateApiKeyStatus(mk);
+};
+
+// ════════════════════════════════
+// BUILT-IN KB DOCS
+// ════════════════════════════════
+const BUILTIN_KB = []; // All docs in Supabase // All docs now in Supabase — no hardcoded built-ins
+let adminDocs = JSON.parse(localStorage.getItem('gm_admin_kb')||'[]');
+let skippedDocs = JSON.parse(localStorage.getItem('gm_skipped_kb')||'[]');
+let currentKBTab = 'all';
+
+// ════════════════════════════════
+// PANEL NAVIGATION
+// ════════════════════════════════
+const panelTitles = {
+  dashboard:['Dashboard','Overview of GSTMind platform'],
+  users:['User Management','Add, edit, block and manage all users'],
+  kb:['Knowledge Base','Manage CBIC documents and auto-sync'],
+  analytics:['Analytics','Query patterns and usage insights'],
+  subscriptions:['Subscriptions','Plans, revenue and billing management'],
+  settings:['Settings','Admin credentials, API key and system config']
+};
+
+function showPanel(name, btn){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  const [title,sub] = panelTitles[name]||[name,''];
+  document.getElementById('topbarTitle').textContent = title;
+  document.getElementById('topbarSub').textContent = sub;
+  const kbStats = document.getElementById('kbVerifyStats');
+  if(kbStats) kbStats.style.display = (name==='kb') ? 'inline' : 'none';
+  if(name==='users')renderUserTable(getAllUsers());
+  if(name==='kb')renderKBList();
+  if(name==='subscriptions')renderSubTable();
+  if(name==='analytics')renderAnalytics();
+}
+
+// ════════════════════════════════
+// DATA HELPERS
+// ════════════════════════════════
+function getAllUsers(){
+  const users = JSON.parse(localStorage.getItem('gm_users')||'[]');
+  const single = JSON.parse(localStorage.getItem('gm_user')||'null');
+  const all = [...users];
+  if(single && !all.find(u=>u.email===single.email&&u.phone===single.phone)) all.push(single);
+  return all;
+}
+
+function saveAllUsers(users){
+  localStorage.setItem('gm_users', JSON.stringify(users));
+  // Update current user if they're in the list
+  const curr = JSON.parse(localStorage.getItem('gm_user')||'null');
+  if(curr){
+    const updated = users.find(u=>(u.email&&u.email===curr.email)||(u.phone&&u.phone===curr.phone));
+    if(updated) localStorage.setItem('gm_user', JSON.stringify(updated));
+  }
+}
+
+// ════════════════════════════════
+// INIT
+// ════════════════════════════════
+async function initAdmin(){
+  loadAdminTheme();
+  loadPrompts();
+  if(skippedDocs.length>0){
+    document.getElementById('kbTabCount-skipped').textContent = skippedDocs.length;
+    document.getElementById('kbTabCount-skipped').style.cssText='background:var(--red-bg);color:var(--red)';
+  }
+  window.addEventListener('beforeunload', ()=>{
+    if(adminDocs.length > 0)
+      localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+  });
+  refreshData();
+  renderKBList(); // show local data immediately
+
+  // Always load from server — source of truth
+  await loadKBFromServer();
+
+  renderAnalytics();
+  const log = JSON.parse(localStorage.getItem('gm_query_log')||'{}');
+  const el = document.getElementById('query-log-count');
+  if(el) el.textContent = Object.keys(log).length + ' unique questions';
+  // Start sync monitor — checks every 60 seconds
+  startSyncMonitor();
+}
+
+function refreshData(){
+  const users = getAllUsers();
+  const free = users.filter(u=>u.plan==='free'||!u.plan).length;
+  const pro = users.filter(u=>u.plan==='pro').length;
+  const unlimited = users.filter(u=>u.plan==='unlimited').length;
+  const paid = pro+unlimited;
+  const totalQueries = users.reduce((s,u)=>s+(u.queryCount||0),0);
+  const queryLog = JSON.parse(localStorage.getItem('gm_query_log')||'{}');
+  const uniqueQueries = Object.keys(queryLog).length;
+  const revenue = pro*999 + unlimited*1999;
+  const apiCost = Math.round(totalQueries * 1);
+
+  document.getElementById('stat-total-users').textContent = users.length;
+  document.getElementById('stat-paid').textContent = paid;
+  document.getElementById('stat-queries').textContent = totalQueries;
+  document.getElementById('stat-revenue').textContent = '₹'+revenue.toLocaleString('en-IN');
+  document.getElementById('stat-users-delta').textContent = `↑ ${users.length} total registered`;
+  document.getElementById('stat-paid-delta').textContent = paid>0?`${paid} paying user${paid>1?'s':''}`:' — No paid users yet';
+  document.getElementById('stat-query-delta').textContent = uniqueQueries>0?`${uniqueQueries} unique questions asked`:`All time: ${totalQueries} queries`;
+  document.getElementById('stat-rev-delta').textContent = `API cost est: ₹${apiCost}/mo`;
+
+  // Nav counts
+  document.getElementById('nav-user-count').textContent = users.length;
+  document.getElementById('nav-kb-count').textContent = adminDocs.length;
+
+  // Plan bars
+  const maxUsers = Math.max(users.length,1);
+  document.getElementById('rev-bar-free').style.width = (free/maxUsers*100)+'%';
+  document.getElementById('rev-bar-pro').style.width = (pro/maxUsers*100)+'%';
+  document.getElementById('rev-bar-unlimited').style.width = (unlimited/maxUsers*100)+'%';
+  document.getElementById('rev-cnt-free').textContent = free;
+  document.getElementById('rev-cnt-pro').textContent = pro;
+  document.getElementById('rev-cnt-unlimited').textContent = unlimited;
+  document.getElementById('api-cost-est').textContent = '₹'+apiCost+'/month';
+
+  // Sub stats
+  document.getElementById('sub-mrr').textContent = '₹'+revenue.toLocaleString('en-IN');
+  document.getElementById('sub-active').textContent = paid;
+  document.getElementById('sub-trial').textContent = free;
+  document.getElementById('plan-cnt-free').textContent = free;
+  document.getElementById('plan-cnt-pro').textContent = pro;
+  document.getElementById('plan-cnt-unlimited').textContent = unlimited;
+  document.getElementById('an-free-cnt').textContent = free;
+  document.getElementById('an-paid-cnt').textContent = paid;
+
+  // Recent signups
+  renderRecentSignups(users);
+}
+
+function renderRecentSignups(users){
+  const el = document.getElementById('recent-signups');
+  if(!users.length){ el.innerHTML='<div class="empty-state" style="padding:16px"><p>No users yet.</p></div>'; return; }
+  const recent = [...users].sort((a,b)=>new Date(b.joinDate||0)-new Date(a.joinDate||0)).slice(0,5);
+  el.innerHTML = recent.map(u=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--accent);flex-shrink:0">${(u.fname?.[0]||'?').toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.name||'Unknown')}</div>
+        <div style="font-size:10.5px;color:var(--text3);font-family:'DM Mono',monospace">${esc(u.email||u.phone||'—')}</div>
+      </div>
+      <span class="badge ${u.plan==='pro'?'badge-pro':u.plan==='unlimited'?'badge-unlimited':'badge-free'}">${u.plan==='pro'?'Pro':u.plan==='unlimited'?'∞':'Free'}</span>
+    </div>`).join('');
+}
+
+// ════════════════════════════════
+// USER TABLE
+// ════════════════════════════════
+let currentUsers = [];
+
+function renderUserTable(users){
+  currentUsers = users;
+  const tbody = document.getElementById('userTableBody');
+  if(!users.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><p>No users yet. Users appear here once they sign up via the main app.</p></div></td></tr>';return;}
+  tbody.innerHTML = users.map((u,i)=>`
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:30px;height:30px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0">${(u.fname?.[0]||'?').toUpperCase()}</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:var(--text)">${esc(u.name||'Unknown')}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-family:'DM Mono',monospace;font-size:11.5px">
+        ${u.email?`<div>${esc(u.email)}</div>`:''}
+        ${u.phone?`<div style="color:var(--text3)">+91 ${esc(u.phone)}</div>`:''}
+      </td>
+      <td>${esc(u.prof||'—')}</td>
+      <td>
+        <span class="badge ${u.plan==='pro'?'badge-pro':u.plan==='unlimited'?'badge-unlimited':'badge-free'}">
+          ${u.plan==='pro'?'Professional':u.plan==='unlimited'?'Unlimited':'Free Trial'}
+        </span>
+      </td>
+      <td style="font-family:'DM Mono',monospace">
+        ${u.queryCount||0} / ${u.plan==='unlimited'?'∞':(u.queryLimit||10)}
+      </td>
+      <td style="font-size:11.5px;color:var(--text3);font-family:'DM Mono',monospace">
+        ${u.joinDate?new Date(u.joinDate).toLocaleDateString('en-IN'):'—'}
+      </td>
+      <td>
+        <span class="badge ${u.blocked?'badge-blocked':'badge-active'}">
+          <span class="badge-dot"></span>${u.blocked?'Blocked':'Active'}
+        </span>
+      </td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-sm" onclick="openChangePlan(${i})">Plan</button>
+          <button class="btn ${u.blocked?'btn-success':'btn-danger'} btn-sm" onclick="toggleBlock(${i})">${u.blocked?'Unblock':'Block'}</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function filterUsers(val){
+  const search = (val||document.getElementById('userSearch').value||'').toLowerCase();
+  const plan = document.getElementById('planFilter').value;
+  const status = document.getElementById('statusFilter').value;
+  let users = getAllUsers();
+  if(search) users = users.filter(u=>(u.name||'').toLowerCase().includes(search)||(u.email||'').toLowerCase().includes(search)||(u.phone||'').includes(search));
+  if(plan) users = users.filter(u=>(u.plan||'free')===plan);
+  if(status==='blocked') users = users.filter(u=>u.blocked);
+  if(status==='active') users = users.filter(u=>!u.blocked);
+  renderUserTable(users);
+}
+
+let selectedUserIdx = null;
+
+function openChangePlan(idx){
+  selectedUserIdx = idx;
+  const u = currentUsers[idx];
+  document.getElementById('cpm-user-name').textContent = 'User: ' + (u.name||'Unknown');
+  document.getElementById('cpm-plan').value = u.plan||'free';
+  document.getElementById('cpm-limit').value = '';
+  document.getElementById('changePlanModal').classList.add('show');
+}
+
+function saveChangePlan(){
+  const users = getAllUsers();
+  const u = currentUsers[selectedUserIdx];
+  const target = users.find(x=>(x.email&&x.email===u.email)||(x.phone&&x.phone===u.phone));
+  if(!target){showToast('User not found','error');return;}
+  target.plan = document.getElementById('cpm-plan').value;
+  const lim = document.getElementById('cpm-limit').value;
+  if(lim) target.queryLimit = parseInt(lim);
+  else target.queryLimit = target.plan==='pro'?100:target.plan==='unlimited'?999999:10;
+  saveAllUsers(users);
+  document.getElementById('changePlanModal').classList.remove('show');
+  renderUserTable(getAllUsers());
+  refreshData();
+  showToast('Plan updated for '+target.name,'success');
+}
+
+function toggleBlock(idx){
+  const users = getAllUsers();
+  const u = currentUsers[idx];
+  const target = users.find(x=>(x.email&&x.email===u.email)||(x.phone&&x.phone===u.phone));
+  if(!target)return;
+  target.blocked = !target.blocked;
+  saveAllUsers(users);
+  renderUserTable(getAllUsers());
+  showToast((target.blocked?'Blocked: ':'Unblocked: ')+target.name, target.blocked?'error':'success');
+}
+
+function showAddUser(){ document.getElementById('addUserModal').classList.add('show'); }
+
+function addUserManually(){
+  const fname=document.getElementById('au-fname').value.trim();
+  const lname=document.getElementById('au-lname').value.trim();
+  const email=document.getElementById('au-email').value.trim();
+  const phone=document.getElementById('au-phone').value.trim();
+  const pass=document.getElementById('au-pass').value;
+  const plan=document.getElementById('au-plan').value;
+  const prof=document.getElementById('au-prof').value;
+  if(!fname||!lname||(!email&&!phone)||!pass){showToast('Please fill all required fields','error');return;}
+  const user={
+    name:fname+' '+lname,fname,lname,email,phone,pass,prof,plan,
+    queryCount:0,queryLimit:plan==='pro'?100:plan==='unlimited'?999999:10,
+    joinDate:new Date().toISOString(),blocked:false,apiKey:''
+  };
+  const users=getAllUsers();users.push(user);saveAllUsers(users);
+  document.getElementById('addUserModal').classList.remove('show');
+  renderUserTable(getAllUsers());refreshData();
+  showToast('User created: '+user.name,'success');
+  ['au-fname','au-lname','au-email','au-phone','au-pass'].forEach(id=>document.getElementById(id).value='');
+}
+
+function exportUsers(){
+  const users=getAllUsers();
+  if(!users.length){showToast('No users to export','error');return;}
+  const header='Name,Email,Phone,Profession,Plan,Queries Used,Joined,Status';
+  const rows=users.map(u=>[u.name,u.email,u.phone,u.prof,u.plan,u.queryCount,u.joinDate?new Date(u.joinDate).toLocaleDateString('en-IN'):'',u.blocked?'Blocked':'Active'].map(v=>`"${v||''}"`).join(','));
+  const csv=[header,...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='GSTMind_Users_'+Date.now()+'.csv';a.click();
+  showToast('Exported '+users.length+' users','success');
+}
+
+// ════════════════════════════════
+// KNOWLEDGE BASE
+// ════════════════════════════════
+
+// ── SMART DEDUP — extracts circular/notification no + date ──
+function extractDocIdentity(text){
+  // Use header only (600 chars) to avoid matching referenced circulars in body text
+  const header = text.slice(0, 300); // 300 chars only — prevents body-text circular refs from matching
+  const t = text.slice(0, 3000); // for year/date fallback only
+
+  // Detect distinct variants first
+  const isCorrigendum = /corrigendum/i.test(header);
+  const isAmendment = /^\s*amendment/im.test(header);
+  const isMasterCircular = /master\s*circular/i.test(header);
+  const isDistinctVariant = isCorrigendum || isAmendment || isMasterCircular;
+
+  // Space-tolerant regex — handles PDF.js "16/16/  2017" with spaces
+  const circularMatch = header.match(/circular\s*no\.?\s*(\d+(?:\s*[\-\/]\s*\d+)*(?:\s*[\-\/]\s*[a-zA-Z]+)?)/i);
+  const notifMatch = header.match(/notification\s*no\.?\s*(\d+(?:\s*[\-\/]\s*\d+)*)/i);
+  const instrMatch = header.match(/instruction\s*no\.?\s*(\d+(?:\s*[\-\/]\s*\d+)*)/i);
+  const yearMatch = header.match(/\b(20[1-3][0-9])\b/);
+
+  // Remove spaces when building refNo for comparison
+  const refNo = (circularMatch?.[1]||notifMatch?.[1]||instrMatch?.[1]||'')
+    .replace(/\s+/g,'').replace(/[\-\/]+$/,'').toLowerCase();
+  const year = yearMatch?.[1] || '';
+  const docType = circularMatch?'circular':notifMatch?'notification':instrMatch?'instruction':'other';
+
+  return { refNo, year, docType, isDistinctVariant,
+    variantType: isCorrigendum?'corrigendum':isAmendment?'amendment':isMasterCircular?'master-circular':'original' };
+}
+
+
+// ── AUTO EXTRACT DOCUMENT NAME, TYPE AND DATE FROM CONTENT ──
+function autoExtractDocMeta(text){
+  const t = text.slice(0, 4000);
+  const hdr = text.slice(0, 300); // header only — prevents body text dates from being picked up
+  let docType='Other', docName='', docDate='';
+
+
+  // ── Circular No. — header only, captures full number including -GST suffix
+  const circM = hdr.match(/circular\s*no\.?\s*(\d+(?:\s*[\-\/]\s*\d+)*(?:\s*[\-\/]\s*[a-zA-Z]+)?)/i);
+  if(circM){ docType='CBIC Circular'; docName='Circular No. '+circM[1].replace(/\s+/g,'').replace(/[\-\/]+$/,'').toUpperCase(); }
+
+  // ── Notification No. — captures number + type suffix
+  const notifM = hdr.match(/notification\s*no\.?\s*(\d+(?:\s*[\-\/]\s*\d+)*(?:\s*[-\u2013]\s*(?:central\s*tax|integrated\s*tax|union\s*territory|customs|gst|ct|it|rate)[\w\s\(\)]*)?)/i);
+  if(notifM && !circM){
+    const val = notifM[1].replace(/\s+/g,'').replace(/[\-\/]+$/,'').replace(/[-–]+(?=[A-Z])/,'-');
+    // Re-attach type suffix cleanly
+    const typeSuffix = notifM[1].match(/[-–]\s*(?:central\s*tax|integrated\s*tax|union\s*territory|customs|gst|ct|it|rate)[\w\s\(\)]*/i);
+    const cleanVal = val.replace(/[a-zA-Z]+$/,'') + (typeSuffix ? typeSuffix[0].replace(/\s+/g,' ').trim() : '');
+    docType='CBIC Notification'; docName='Notification No. '+cleanVal.toUpperCase();
+  }
+
+  // ── Instruction No.
+  const instrM = hdr.match(/instruction\s*no\.?\s*(\d+(?:\s*[\-\/]\s*\d+)*(?:\s*[\-\/]\s*[a-zA-Z]+)?)/i);
+  if(instrM && !circM && !notifM){ docType='CBIC Circular'; docName='Instruction No. '+instrM[1].replace(/\s+/g,'').replace(/[\-\/]+$/,'').toUpperCase(); }
+
+  // ── Corrigendum
+  const corrM = hdr.match(/corrigendum\s*to\s*(?:circular|notification|instruction)\s*no\.?\s*(\d+(?:\s*[\-\/]\s*\d+)*)/i);
+  if(corrM){ docType='CBIC Circular'; docName='Corrigendum to Circular No. '+corrM[1].replace(/\s+/g,'').replace(/[\-\/]+$/,'').toUpperCase(); }
+
+  // ── Amendment / Addendum
+  const amendM = t.match(/amendment\s*to\s*(?:circular|notification)\s*no\.?\s*([\d\/\-]+)/i);
+  if(amendM && !corrM){ docType='CBIC Circular'; docName='Amendment to Circular No. '+amendM[1].trim().replace(/[\-\/]+$/,'').toUpperCase(); }
+
+  // ── AAR / AAAR
+  if(!docName && /authority\s*for\s*advance\s*ruling|advance\s*ruling/i.test(t)){
+    docType='AAR/AAAR Order';
+    const caseM = t.match(/(GST-A[AR]+A?-[\w\/\-\.]+)/i);
+    docName = caseM ? 'AAR '+caseM[1].toUpperCase() : 'AAR Order';
+  }
+
+  // ── GST Act / Rules
+  if(!docName){
+    if(/central goods and services tax act/i.test(t)){ docType='GST Act Section'; docName='CGST Act 2017'; }
+    else if(/integrated goods and services tax act/i.test(t)){ docType='GST Act Section'; docName='IGST Act 2017'; }
+    else if(/union territory goods and services/i.test(t)){ docType='GST Act Section'; docName='UTGST Act 2017'; }
+    else if(/cgst rules|central goods.*services.*tax.*rules/i.test(t)){ docType='GST Rules'; docName='CGST Rules 2017'; }
+    else if(/frequently asked|faq/i.test(t)){ docType='CBIC FAQ'; docName='CBIC FAQ'; }
+    else docName='GST Document';
+  }
+
+  // ── Date extraction — PDF.js often adds spaces in ordinals ("26 th" not "26th")
+  // Date extraction — header only (first 300 chars via hdr variable)
+  // PRIORITY ORDER MATTERS: New Delhi pattern first to prevent body-text dates overriding
+  const datePats=[
+    // P1: "New Delhi <anything> 15 th November 2017" — no "dated" needed, handles PDF.js artifacts
+    /new\s+delhi[\s,\.\*]+(?:dated[\s,\.]+)?(?:the\s+)?(\d{1,2}\s*(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december)\s*[,\.\s]*\d{4})/i,
+    /new\s+delhi[\s,\.\*]+(?:dated[\s,\.]+)?(?:the\s+)?(\d{1,2}\s*(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s*[,\.\s]*\d{4})/i,
+    // P2: "dated 18th October, 2017" or "dated 26 th June. 2017"
+    /dated[\s,\.]+(?:the\s+)?(\d{1,2}\s*(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december)\s*[,\.\s]*\d{4})/i,
+    /dated[\s,\.]+(?:the\s+)?(\d{1,2}\s*(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s*[,\.\s]*\d{4})/i,
+    // P3: "the 5th July, 2022" — notification format
+    /,\s*the\s+(\d{1,2}\s*(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s*,?\s*\d{4})/i,
+    // P4: dated DD.MM.YYYY only — no bare fallback
+    /dated[\s,]+(\d{1,2}[\.\/\-]\d{1,2}[\.\/\-]\d{4})/i,
+  ];
+  for(const p of datePats){
+    const m=hdr.match(p);
+    if(m){
+      docDate=m[1].replace(/\s+/g,' ').replace(/(\d)\s+(st|nd|rd|th)/gi,'$1$2').replace(/\.\s*(\d{4})/,' $1').trim();
+      break;
+    }
+  }
+
+  if(docDate) docName=docName+' dated '+docDate;
+  return {docName, docType, docDate};
+}
+
+function isDuplicateContent(text, nameHint){
+  const newId = extractDocIdentity(text);
+  const allDocs = [...adminDocs, ...BUILTIN_KB];
+
+  // RULE: Two documents are duplicates ONLY if they have the SAME variantType
+  // "Corrigendum to Circular No. 23/23/2017" ≠ "Circular No. 23/23/2017"
+  // "Amendment to Circular No. X" ≠ "Circular No. X"
+  // Only exact same document type + same number + same year = duplicate
+
+  for(const d of allDocs){
+    const existId = d.docIdentity || extractDocIdentity(d.content || d.text || '');
+
+    // variantType must match — 'original' vs 'corrigendum' are always different docs
+    const newVariant = newId.variantType || 'original';
+    const existVariant = existId.variantType || 'original';
+    if(newVariant !== existVariant) continue;
+
+    // Same ref number + year + docType = duplicate
+    if(newId.refNo && existId.refNo &&
+       newId.refNo === existId.refNo &&
+       newId.year && existId.year &&
+       newId.year === existId.year &&
+       newId.docType === existId.docType){
+      return { name: d.name, reason: `Same ${newVariant==='original'?'':newVariant+' '}${newId.docType} number (${newId.refNo.toUpperCase()}) and year (${newId.year})` };
+    }
+  }
+
+  // Fallback: byte-for-byte identical content
+  const hash = fullContentHash(text);
+  for(const d of allDocs){
+    const existHash = d.contentHash || fullContentHash(d.content || d.text || '');
+    if(hash === existHash && hash !== '0'){
+      return { name: d.name, reason: 'Identical content' };
+    }
+  }
+
+  return null;
+}
+
+function fullContentHash(text){
+  // Hash of full normalised content (for non-numbered docs)
+  const normalised = text.toLowerCase().replace(/\s+/g,' ').trim();
+  if(normalised.length < 100) return '0'; // too short to be reliable
+  let hash = 5381;
+  for(let i=0;i<normalised.length;i++){
+    hash = ((hash<<5)+hash)+normalised.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+
+// ── KB UPLOAD SYSTEM (clean rewrite) ──
+
+async function readFileText(file, onProgress){
+  const isPDF = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+  if(isPDF){
+    return await extractPDFText(file, onProgress);
+  }
+  return new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=e=>resolve(e.target.result||'');
+    r.onerror=()=>resolve('');
+    r.readAsText(file);
+  });
+}
+
+async function extractPDFText(file, onProgress){
+  try{
+    if(typeof pdfjsLib === 'undefined') return '';
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+    const totalPages = pdf.numPages;
+    let fullText = '';
+
+    // Extract ALL pages — needed for complete content
+    // Large docs (200+ pages) process in batches to keep UI responsive
+    for(let i=1; i<=totalPages; i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item=>item.str).join(' ');
+      fullText += pageText + '\n';
+      // Yield to browser every 20 pages to show progress
+      if(i % 20 === 0){
+        if(onProgress) onProgress(i, totalPages);
+        await new Promise(r=>setTimeout(r,5));
+      }
+    }
+    return fullText.trim();
+  } catch(e){
+    console.log('PDF extract error:', e.message);
+    return '';
+  }
+}
+
+async function kbOnDrop(e){
+  e.preventDefault();
+  const items=e.dataTransfer.items;
+  if(!items||!items.length)return;
+  const files=[];
+  async function readEntry(entry){
+    if(!entry) return;
+    if(entry.isFile){
+      await new Promise(res=>entry.file(f=>{
+        if(/\.(pdf|txt|doc)$/i.test(f.name)) files.push(f);
+        res();
+      }));
+    } else if(entry.isDirectory){
+      // readEntries only returns max 100 at a time — must loop to get all
+      const reader = entry.createReader();
+      const readBatch = () => new Promise(res=>{
+        reader.readEntries(async ents=>{
+          if(!ents.length){ res(); return; }
+          for(const en of ents) await readEntry(en);
+          readBatch().then(res); // keep reading until empty
+        });
+      });
+      await readBatch();
+    }
+  }
+  for(let i=0;i<items.length;i++){
+    const en=items[i].webkitGetAsEntry?.();
+    if(en)await readEntry(en);
+  }
+  if(!files.length){showToast('No PDF or TXT files found in the dropped folder','error');return;}
+  kbHandleFiles(files);
+}
+
+function kbHandleFiles(fileList){
+  const files=Array.from(fileList).filter(f=>/\.(pdf|txt|doc)$/i.test(f.name));
+  if(!files.length){showToast('No supported files found','error');return;}
+  if(files.length===1){
+    // Single file — load into paste area
+    readFileText(files[0]).then(content=>{
+      const meta=autoExtractDocMeta(content);
+      document.getElementById('kb-doc-name').value=meta.docName;
+      const sel=document.getElementById('kb-doc-type');
+      if([...sel.options].some(o=>o.value===meta.docType))sel.value=meta.docType;
+      document.getElementById('kb-doc-text').value=content;
+      showToast('✓ Loaded: '+meta.docName,'success');
+    });
+  } else {
+    kbProcessBulk(files);
+  }
+}
+
+async function kbProcessBulk(files){
+  const prog=document.getElementById('kbProgress');
+  const bar=document.getElementById('kbProgBar');
+  const title=document.getElementById('kbProgTitle');
+  const countEl=document.getElementById('kbProgCount');
+  const fileEl=document.getElementById('kbProgFile');
+  const statsEl=document.getElementById('kbProgStats');
+
+  prog.style.display='block';
+  bar.style.width='0%';
+  title.textContent='Starting...';
+  statsEl.textContent='';
+  await new Promise(r=>setTimeout(r,30));
+
+  // Get API token for uploading to server
+  const token = await ensureApiToken();
+  if(!token){
+    showToast('⚠ Not connected to server — log out and log back in with your GSTMind email','error');
+    prog.style.display='none';
+    return;
+  }
+
+  const total=files.length;
+  let added=0,dupes=0,errors=0;
+
+  for(let i=0;i<total;i++){
+    const f=files[i];
+    const pct=Math.round(i/total*100);
+    bar.style.width=pct+'%';
+    title.textContent=`Processing ${i+1} of ${total}`;
+    countEl.textContent=`${i+1} / ${total}`;
+    fileEl.textContent='📄 '+f.name;
+    statsEl.textContent=`✓ ${added} added  ⚠ ${dupes} duplicates  ✗ ${errors} errors`;
+    await new Promise(r=>setTimeout(r,15));
+
+    try{
+      // Step 1: Extract text with PDF.js (all pages, no limit)
+      let content = await readFileText(f, (page, total)=>{
+        fileEl.textContent = `📄 ${f.name} — reading page ${page} of ${total}...`;
+      });
+      if(!content || content.trim().length < 30){
+        errors++;
+        fileEl.textContent = `⚠ Skipped (scanned/empty PDF): ${f.name}`;
+        addUploadLog('skip', `Skipped: ${f.name}`, 'Scanned PDF or no extractable text — use text-based PDF or OCR first');
+        skippedDocs.push({
+          id:'s'+Date.now()+Math.random(),
+          fileName:f.name,
+          name:f.name,
+          type:'Unknown',
+          date:'',
+          reason:'Scanned/image-based PDF — no text extractable',
+          matchedDoc:'',
+          content:'',
+          skippedAt:new Date().toISOString()
+        });
+        localStorage.setItem('gm_skipped_kb',JSON.stringify(skippedDocs));
+        await new Promise(r=>setTimeout(r,15));
+        continue;
+      }
+
+      const wordCount = content.split(/\s+/).filter(w=>w).length;
+      // Warn if suspiciously low word count (may be partially scanned)
+      const pagesEst = Math.ceil(wordCount / 250);
+      if(wordCount < 100){
+        fileEl.textContent = `⚠ Very low text (${wordCount} words) — may be scanned: ${f.name}`;
+        addUploadLog('skip', `Low text warning: ${f.name}`, `Only ${wordCount} words extracted`);
+        errors++;
+        continue;
+      }
+      fileEl.textContent = `📄 ${f.name} — ${wordCount.toLocaleString()} words (~${pagesEst} pages), uploading...`;
+      await new Promise(r=>setTimeout(r,10));
+
+      // Step 2: Extract metadata
+      const meta = autoExtractDocMeta(content);
+      const identity = extractDocIdentity(content);
+
+      // Step 3: Check duplicate locally first (fast)
+      const dupeResult = isDuplicateContent(content, meta.docName);
+      if(dupeResult){
+        dupes++;
+        fileEl.textContent='⚠ Duplicate: '+f.name;
+        skippedDocs.push({
+          id:'s'+Date.now()+Math.random(),
+          fileName:f.name,
+          name:meta.docName.replace(/[\-\/]+$/,'').trim(),
+          type:meta.docType,
+          date:meta.docDate||'',
+          reason:dupeResult.reason,
+          matchedDoc:dupeResult.name,
+          content:content.slice(0,5000),
+          skippedAt:new Date().toISOString()
+        });
+        localStorage.setItem('gm_skipped_kb',JSON.stringify(skippedDocs));
+        continue;
+      }
+
+      // Step 4: Check if already on server (prevent re-upload)
+      if(isAlreadyOnServer(meta.docName, identity)){
+        dupes++;
+        fileEl.textContent = `⟳ Already on server: ${meta.docName}`;
+        addUploadLog('skip', `Already on server: ${meta.docName}`);
+        await new Promise(r=>setTimeout(r,15));
+        continue;
+      }
+
+      // Step 5: Upload to Railway → Supabase
+      fileEl.textContent = `↑ Uploading: ${meta.docName}`;
+      addUploadLog('info', `Uploading: ${meta.docName}`);
+      
+      const uploadRes = await fetch(API+'/kb/upload',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({
+          name: meta.docName,
+          type: meta.docType,
+          doc_date: meta.docDate||'',
+          content: content,
+          doc_identity: identity
+        })
+      });
+
+      if(!uploadRes.ok){
+        const err = await uploadRes.json().catch(()=>({}));
+        if(uploadRes.status === 401){
+          adminApiToken = '';
+          localStorage.removeItem('gm_admin_api_token');
+          showToast('Session expired — please log in again','error');
+          addUploadLog('error','Session expired — upload stopped');
+          break;
+        }
+        errors++;
+        const errMsg = err.detail||'Server error';
+        fileEl.textContent = `✗ Failed: ${f.name}`;
+        addUploadLog('error', `Failed: ${meta.docName}`, errMsg);
+        await new Promise(r=>setTimeout(r,500));
+        continue;
+      }
+
+      const result = await uploadRes.json();
+      added++;
+      fileEl.textContent = `✓ ${meta.docName} — ${result.chunks} chunks`;
+      addUploadLog('success', `Uploaded: ${meta.docName}`, `${result.chunks} chunks stored`);
+
+      adminDocs.push({
+        id: result.id, name: meta.docName, type: meta.docType,
+        content: content.slice(0,10000),
+        contentHash: fullContentHash(content),
+        docIdentity: identity, chunks: result.chunks,
+        date: meta.docDate||new Date().toLocaleDateString('en-IN'),
+        builtin: false, supabase: true
+      });
+
+      if(added%5===0){ renderKBList(); localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs)); }
+      await new Promise(r=>setTimeout(r,300));
+    }catch(e){
+      console.error('Error processing '+f.name+':', e);
+      errors++;
+      fileEl.textContent = `✗ Error: ${f.name}`;
+    }
+  }
+
+  bar.style.width='100%';
+  title.textContent='✓ Complete';
+  countEl.textContent=`${total} / ${total}`;
+  fileEl.textContent='All files processed';
+  statsEl.textContent=`✓ ${added} uploaded to server  ⚠ ${dupes} duplicates  ✗ ${errors} errors`;
+  statsEl.style.color='var(--green)';
+  // Reload from server to show correct state
+  await loadKBFromServer();
+  refreshData();
+  const summary = `✓ ${added} uploaded · ${dupes} skipped · ${errors} errors`;
+  showToast(summary, errors>0?'error':'success');
+  addUploadLog(errors>0?'error':'success','Batch complete: '+summary);
+  await checkKBSync(); // Verify sync after upload
+  setTimeout(()=>{prog.style.display='none';bar.style.width='0%';},8000);
+}
+
+// Legacy function name kept for compatibility
+async function processBulkFiles(files){ return kbProcessBulk(files); }
+
+// Load KB documents from server and merge with local list
+
+async 
+async function uploadAllLocal(){
+  const localDocs = adminDocs.filter(d=>!d.supabase && !d.builtin);
+  if(!localDocs.length){ showToast('No local-only docs found','info'); return; }
+  showToast(`Select files for ${localDocs.length} local docs — upload them one by one`,'info');
+  // Guide user to use individual ↑ Upload buttons
+  document.querySelectorAll('[onclick^="reuploadDoc"]').forEach(btn=>{
+    btn.style.animation='pulse 1s ease 3';
+  });
+}
+
+
+async function reuploadWithContent(doc, content){
+  const token = await ensureApiToken();
+  if(!token) return;
+  showToast('Uploading to server...','info');
+  try{
+    const res = await fetch(API+'/kb/upload',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({
+        name:doc.name, type:doc.type, doc_date:doc.date||'',
+        content:content, doc_identity:doc.docIdentity||{}
+      })
+    });
+    if(res.ok){
+      const result = await res.json();
+      doc.id = result.id;
+      doc.chunks = result.chunks;
+      doc.supabase = true;
+      showToast(`✓ ${doc.name} — ${result.chunks} chunks on server`,'success');
+      renderKBList();
+      localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+    } else {
+      const err = await res.json().catch(()=>({}));
+      showToast('Upload failed: '+(err.detail||'Server error'),'error');
+    }
+  }catch(e){ showToast('Error: '+e.message,'error'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+// UPLOAD MANAGER — Background queue with dedup, logging, persistence
+// ════════════════════════════════════════════════════════════════
+
+let uploadLog = JSON.parse(localStorage.getItem('gm_upload_log')||'[]');
+let uploadQueueRunning = false;
+let uploadQueue = [];
+
+function addUploadLog(type, message, detail=''){
+  const entry = {
+    type, // 'success','error','skip','info'
+    message,
+    detail,
+    time: new Date().toLocaleTimeString('en-IN'),
+    date: new Date().toLocaleDateString('en-IN')
+  };
+  uploadLog.unshift(entry);
+  if(uploadLog.length > 200) uploadLog = uploadLog.slice(0,200);
+  localStorage.setItem('gm_upload_log', JSON.stringify(uploadLog));
+  renderUploadLog();
+}
+
+function renderUploadLog(){
+  const el = document.getElementById('uploadLogEntries');
+  if(!el) return;
+  if(!uploadLog.length){ el.innerHTML='<div style="color:#666">No upload activity yet.</div>'; return; }
+  const colors = {success:'#4ade80',error:'#f87171',skip:'#fbbf24',info:'#60a5fa'};
+  el.innerHTML = uploadLog.map(e=>`
+    <div style="padding:3px 0;border-bottom:1px solid #333;display:flex;gap:8px">
+      <span style="color:#666;flex-shrink:0">${e.date} ${e.time}</span>
+      <span style="color:${colors[e.type]||'#e0e0e0'};flex-shrink:0">[${e.type.toUpperCase()}]</span>
+      <span style="color:#e0e0e0">${e.message}</span>
+      ${e.detail?`<span style="color:#888;font-size:10px">${e.detail}</span>`:''}
+    </div>
+  `).join('');
+}
+
+function toggleUploadLog(){
+  const panel = document.getElementById('uploadLogPanel');
+  if(!panel) return;
+  panel.style.display = panel.style.display==='none' ? 'block' : 'none';
+  if(panel.style.display==='block') renderUploadLog();
+}
+
+function clearUploadLog(){
+  uploadLog = [];
+  localStorage.removeItem('gm_upload_log');
+  renderUploadLog();
+}
+
+// Check if doc is already on Supabase by name+identity
+function isAlreadyOnServer(docName, identity){
+  return adminDocs.some(d => 
+    d.supabase && (
+      d.name === docName ||
+      (d.docIdentity?.refNo && identity?.refNo && 
+       d.docIdentity.refNo === identity.refNo &&
+       d.docIdentity.year === identity.year &&
+       (d.docIdentity.variantType||'original') === (identity.variantType||'original'))
+    )
+  );
+}
+
+async function uploadAllLocal(){
+  const localDocs = adminDocs.filter(d=>!d.supabase && !d.builtin && d.content && d.content.length >= 100);
+  const alreadyServer = adminDocs.filter(d=>d.supabase && !d.builtin).length;
+  
+  if(!localDocs.length){ 
+    showToast(`All ${alreadyServer} documents already on server ✓`,'success');
+    addUploadLog('info',`Sync check: all ${alreadyServer} docs already on server`);
+    return; 
+  }
+  
+  const token = await ensureApiToken();
+  if(!token) return;
+  
+  showToast(`Syncing ${localDocs.length} local docs to server (${alreadyServer} already there)...`,'info');
+  addUploadLog('info',`Starting sync: ${localDocs.length} docs to upload, ${alreadyServer} already on server`);
+  
+  let done=0, skipped=0, failed=0;
+  for(const doc of localDocs){
+    try{
+      addUploadLog('info',`Uploading: ${doc.name}`);
+      const res = await fetch(API+'/kb/upload',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({
+          name:doc.name, type:doc.type||'', doc_date:doc.date||'',
+          content:doc.content, doc_identity:doc.docIdentity||{}
+        })
+      });
+      if(res.ok){
+        const result = await res.json();
+        doc.id = result.id;
+        doc.chunks = result.chunks;
+        doc.supabase = true;
+        done++;
+        addUploadLog('success',`Uploaded: ${doc.name}`,`${result.chunks} chunks`);
+      } else {
+        const err = await res.json().catch(()=>({}));
+        failed++;
+        addUploadLog('error',`Failed: ${doc.name}`, err.detail||'Server error');
+      }
+    }catch(e){
+      failed++;
+      addUploadLog('error',`Error: ${doc.name}`, e.message);
+    }
+    await new Promise(r=>setTimeout(r,300));
+  }
+  
+  localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+  renderKBList();
+  
+  const summary = `✓ ${done} uploaded${skipped?' · '+skipped+' skipped':''}${failed?' · '+failed+' failed':''}`;
+  showToast(summary, failed>0?'error':'success');
+  addUploadLog(failed>0?'error':'success', 'Sync complete: '+summary);
+}
+
+function reuploadDoc(docId){
+  const doc = adminDocs.find(d=>d.id===docId);
+  if(!doc){ showToast('Document not found','error'); return; }
+  // If we have enough content stored, upload directly without asking for file
+  if(doc.content && doc.content.length >= 500 && !doc.content.includes('[NOTE: Document truncated')){
+    reuploadWithContent(doc, doc.content);
+    return;
+  }
+  // Otherwise need original file
+  showToast('Please select the original file to upload','info');
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.pdf,.txt';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const token = await ensureApiToken();
+    if(!token) return;
+    showToast('Reading file...','info');
+    try{
+      const content = await readFileText(file, (page, total) => {});
+      if(!content || content.trim().length < 30){
+        showToast('Could not extract text from file','error'); return;
+      }
+      showToast('Uploading to server...','info');
+      const res = await fetch(API+'/kb/upload',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+        body:JSON.stringify({
+          name:doc.name, type:doc.type, doc_date:doc.date||'',
+          content:content, doc_identity:doc.docIdentity||{}
+        })
+      });
+      if(res.ok){
+        const result = await res.json();
+        doc.id = result.id;
+        doc.chunks = result.chunks;
+        doc.content = content.slice(0,2000);
+        doc.supabase = true;
+        showToast(`✓ ${doc.name} — ${result.chunks} chunks on server`,'success');
+        renderKBList();
+        localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+      } else {
+        const err = await res.json().catch(()=>({}));
+        showToast('Upload failed: '+(err.detail||'Server error'),'error');
+      }
+    }catch(err){ showToast('Error: '+err.message,'error'); }
+  };
+  input.click();
+}
+
+
+// ════════════════════════════════════════════════════════════════
+// KB SYNC STATUS — Always in sync with Supabase
+// ════════════════════════════════════════════════════════════════
+
+async function checkKBSync(){
+  const dot = document.getElementById('kbSyncDot');
+  const txt = document.getElementById('kbSyncText');
+  if(!dot||!txt) return;
+
+  // Show checking state
+  dot.style.background = '#fbbf24';
+  txt.textContent = 'KB Sync: Checking...';
+
+  if(!adminApiToken){
+    dot.style.background = '#f87171';
+    txt.textContent = 'KB Sync: Not logged in';
+    return;
+  }
+
+  try{
+    const res = await fetch(API+'/kb/documents',{
+      headers:{'Authorization':'Bearer '+adminApiToken}
+    });
+    if(!res.ok) throw new Error('Server error '+res.status);
+    
+    const serverDocs = await res.json();
+    const serverCount = serverDocs.length;
+    const localServerCount = adminDocs.filter(d=>d.supabase&&!d.builtin).length;
+    const localOnlyCount = adminDocs.filter(d=>!d.supabase&&!d.builtin).length;
+    
+    lastSyncTime = new Date();
+    const timeStr = lastSyncTime.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+    if(localOnlyCount > 0){
+      // Some docs not on server
+      dot.style.background = '#f59e0b';
+      txt.textContent = `KB Sync: ${localOnlyCount} pending ↑`;
+      txt.title = `${serverCount} on server, ${localOnlyCount} local-only — click "Sync Local → Server" to upload`;
+      document.getElementById('uploadAllBtn').style.display = 'inline-flex';
+    } else if(serverCount === 0){
+      dot.style.background = '#f87171';
+      txt.textContent = 'KB Sync: Empty — upload documents';
+    } else {
+      // All in sync
+      dot.style.background = '#22c55e';
+      const totalChunks = serverDocs.reduce((s,d)=>s+(d.chunk_count||0),0);
+      txt.textContent = `KB Sync: ✓ ${serverCount} docs · ${totalChunks} chunks · ${timeStr}`;
+      txt.title = `${serverCount} documents with ${totalChunks} total chunks stored in Supabase`;
+      document.getElementById('uploadAllBtn').style.display = 'none';
+    }
+
+    // Update system status too
+    const sysDot = document.getElementById('systemStatusDot');
+    const sysTxt = document.getElementById('systemStatusText');
+    if(sysDot&&sysTxt){ sysDot.style.background='#22c55e'; sysTxt.textContent='System Online'; }
+
+    // Update panel stats
+    const totalChunksAll = serverDocs.reduce((s,d)=>s+(d.chunk_count||0),0);
+    const verifyEl = document.getElementById('kbVerifyStats');
+    if(verifyEl) verifyEl.textContent = `${serverCount} docs · ${totalChunksAll} chunks in Supabase`;
+
+    // Replace adminDocs completely with server state
+    adminDocs = serverDocs.map(sd=>({
+      id:sd.id, name:sd.name, type:sd.type||'',
+      date:sd.doc_date||'', chunks:sd.chunk_count||0,
+      builtin:false, supabase:true, content:''
+    }));
+    localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+    
+    const countEl = document.getElementById('nav-kb-count');
+    if(countEl) countEl.textContent = adminDocs.length;
+    
+    renderKBList();
+
+  }catch(e){
+    dot.style.background = '#f87171';
+    txt.textContent = 'KB Sync: Error — ' + e.message.slice(0,30);
+    const sysDot = document.getElementById('systemStatusDot');
+    const sysTxt = document.getElementById('systemStatusText');
+    if(sysDot&&sysTxt){ sysDot.style.background='#f87171'; sysTxt.textContent='Server Unreachable'; }
+  }
+}
+
+function startSyncMonitor(){
+  // Check sync immediately
+  checkKBSync();
+  // Then check every 60 seconds automatically
+  if(syncCheckInterval) clearInterval(syncCheckInterval);
+  syncCheckInterval = setInterval(checkKBSync, 60000);
+}
+
+function stopSyncMonitor(){
+  if(syncCheckInterval) clearInterval(syncCheckInterval);
+}
+
+
+async function loadKBFromServer(){
+  if(!adminApiToken) return;
+  try{
+    const res = await fetch(API+'/kb/documents',{
+      headers:{'Authorization':'Bearer '+adminApiToken}
+    });
+    if(!res.ok){ console.log('KB server load failed:', res.status); return; }
+    const serverDocs = await res.json();
+    
+    // SERVER IS THE ONLY SOURCE OF TRUTH
+    // Completely replace local state with server state
+    // This ensures deletions on server are reflected immediately on reload
+    const serverAdminDocs = serverDocs.map(sd=>({
+      id: sd.id,
+      name: sd.name,
+      type: sd.type||'',
+      date: sd.doc_date||sd.created_at?.slice(0,10)||'',
+      chunks: sd.chunk_count||0,
+      builtin: false,
+      supabase: true,
+      content: ''
+    }));
+    
+    // Replace adminDocs entirely with server data
+    adminDocs = serverAdminDocs;
+    
+    // Overwrite localStorage with server state
+    localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+    
+    renderKBList();
+    const countEl = document.getElementById('nav-kb-count');
+    if(countEl) countEl.textContent = adminDocs.length;
+    
+    console.log(`KB synced from server: ${adminDocs.length} documents`);
+  }catch(e){ console.log('Could not load KB from server:', e.message); }
+}
+
+
+
+
+// ── DOCUMENT VIEWER ──
+
+// ── KB TAB SWITCHING ──
+function switchKBTab(tab, btn){
+  currentKBTab = tab;
+  document.querySelectorAll('.kb-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('kbView-all').style.display = tab==='all'?'block':'none';
+  document.getElementById('kbView-cat').style.display = tab==='cat'?'block':'none';
+  document.getElementById('kbView-skipped').style.display = tab==='skipped'?'block':'none';
+  if(tab==='cat') renderKBCategories();
+  if(tab==='skipped') renderSkippedDocs();
+  // Show/hide select all and delete button
+  const selectRow = document.querySelector('.select-all-row');
+  if(selectRow) selectRow.style.display = tab==='all'?'flex':'none';
+  const delBtn = document.getElementById('deleteSelectedBtn');
+  if(delBtn && tab!=='all') { delBtn.style.display='none'; }
+}
+
+// ── SELECT ALL ──
+function toggleSelectAll(checked){
+  document.querySelectorAll('.kb-select-chk').forEach(chk=>{
+    chk.checked = checked;
+  });
+  updateDeleteBtn();
+}
+
+function updateDeleteBtn(){
+  const checked = document.querySelectorAll('.kb-select-chk:checked').length;
+  const total = document.querySelectorAll('.kb-select-chk').length;
+  const btn = document.getElementById('deleteSelectedBtn');
+  const selectAll = document.getElementById('selectAllChk');
+  if(btn){ 
+    btn.style.display = checked > 0 ? 'inline-flex' : 'none';
+    btn.textContent = `🗑 Delete Selected (${checked})`;
+  }
+  if(selectAll){
+    selectAll.indeterminate = checked > 0 && checked < total;
+    if(checked === total && total > 0) selectAll.checked = true;
+    else if(checked === 0) selectAll.checked = false;
+  }
+}
+
+// ── SKIPPED DOCS ──
+function renderSkippedDocs(){
+  const el = document.getElementById('kbSkippedList');
+  if(!skippedDocs.length){
+    el.innerHTML='<div class="empty-state"><p>No skipped documents.</p></div>';
+    return;
+  }
+  el.innerHTML = skippedDocs.map(d=>`
+    <div class="skipped-item" id="skip-${d.id}">
+      <div class="skip-icon">⚠</div>
+      <div class="skip-info">
+        <div class="skip-name">${esc(d.fileName)}</div>
+        <div class="skip-reason">Reason: ${esc(d.reason)}</div>
+        <div class="skip-match">Matched existing: "${esc(d.matchedDoc)}"</div>
+        ${d.name!=='GST Document'?`<div class="skip-match">Detected as: ${esc(d.name)} · ${esc(d.type)}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <button class="btn btn-ghost btn-sm" onclick="viewSkippedDoc('${d.id}')">👁 View</button>
+        <button class="btn btn-primary btn-sm" onclick="addSkippedDoc('${d.id}')">+ Add Anyway</button>
+        <button class="btn btn-danger btn-sm" onclick="removeSkipped('${d.id}')">✕ Dismiss</button>
+      </div>
+    </div>`).join('');
+}
+
+function viewSkippedDoc(id){
+  const d = skippedDocs.find(s=>s.id===id);
+  if(!d) return;
+  document.getElementById('dvTitle').textContent = d.name + ' (Skipped)';
+  document.getElementById('dvMeta').textContent = d.type + ' · Skipped: duplicate of "' + d.matchedDoc + '"';
+  document.getElementById('dvBody').textContent = d.content || 'No content available';
+  document.getElementById('docViewerModal').classList.add('show');
+}
+
+function addSkippedDoc(id){
+  const d = skippedDocs.find(s=>s.id===id);
+  if(!d) return;
+  const content = d.content||'';
+  const words = content.split(/\s+/).filter(w=>w);
+  const identity = extractDocIdentity(content);
+  adminDocs.push({
+    id: 'd'+Date.now()+Math.random(),
+    name: d.name!=='GST Document' ? d.name : d.fileName.replace(/\.[^.]+$/,''),
+    type: d.type||'Other',
+    content, text:content,
+    chunks: Math.ceil(words.length/400),
+    date: d.date||new Date().toLocaleDateString('en-IN'),
+    builtin: false,
+    contentHash: fullContentHash(content),
+    docIdentity: identity
+  });
+  try{ localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs)); } catch(e){}
+  removeSkipped(id);
+  renderKBList();refreshData();
+  showToast('Added: ' + d.name, 'success');
+}
+
+function removeSkipped(id){
+  skippedDocs = skippedDocs.filter(s=>s.id!==id);
+  localStorage.setItem('gm_skipped_kb', JSON.stringify(skippedDocs));
+  document.getElementById('kbTabCount-skipped').textContent = skippedDocs.length;
+  renderSkippedDocs();
+}
+
+function clearAllSkipped(){
+  skippedDocs=[];
+  localStorage.removeItem('gm_skipped_kb');
+  document.getElementById('kbTabCount-skipped').textContent = '0';
+  renderSkippedDocs();
+  showToast('Skipped list cleared','success');
+}
+
+// ── CATEGORY VIEW ──
+function renderKBCategories(filter){
+  const el = document.getElementById('kbCatList');
+  const allDocs = [...BUILTIN_KB,...adminDocs];
+  const filtered = filter ? allDocs.filter(d=>d.name.toLowerCase().includes(filter.toLowerCase())) : allDocs;
+
+  // Group by type > year
+  const groups = {};
+  filtered.forEach(d=>{
+    const type = d.type||'Other';
+    const year = d.docIdentity?.year || (d.date?d.date.match(/\d{4}/)?.[0]:'') || 'Unknown';
+    if(!groups[type]) groups[type]={};
+    if(!groups[type][year]) groups[type][year]=[];
+    groups[type][year].push(d);
+  });
+
+  const typeOrder = ['CBIC Circular','CBIC Notification','GST Act Section','GST Rules','AAR/AAAR Order','CBIC FAQ','Other'];
+  const typeIcons = {'CBIC Circular':'📋','CBIC Notification':'🔔','GST Act Section':'⚖','GST Rules':'📜','AAR/AAAR Order':'🏛','CBIC FAQ':'❓','Other':'📄'};
+
+  el.innerHTML = typeOrder
+    .filter(type=>groups[type])
+    .map(type=>{
+      const yearGroups = groups[type];
+      const totalDocs = Object.values(yearGroups).reduce((s,v)=>s+v.length,0);
+      const sortedYears = Object.keys(yearGroups).sort((a,b)=>b.localeCompare(a));
+      return `
+        <div class="kb-category">
+          <div class="kb-cat-header" onclick="toggleCat(this)">
+            <span>${typeIcons[type]||'📄'}</span>
+            <span class="kb-cat-name">${esc(type)}</span>
+            <span class="kb-cat-count">${totalDocs} doc${totalDocs!==1?'s':''}</span>
+            <span class="kb-cat-arrow">▶</span>
+          </div>
+          <div class="kb-cat-body">
+            ${sortedYears.map(year=>`
+              <div class="kb-year-group">
+                <div class="kb-year-header" onclick="toggleYear(this)">
+                  <span>▶</span> <span>${esc(year)}</span>
+                  <span style="margin-left:auto;color:var(--text3)">${yearGroups[year].length} doc${yearGroups[year].length!==1?'s':''}</span>
+                </div>
+                <div class="kb-year-docs">
+                  ${yearGroups[year].map(d=>`
+                    <div class="kb-item" style="padding-left:44px">
+                      <div class="kb-icon" style="width:28px;height:28px;font-size:13px">${typeIcons[d.type||'Other']||'📄'}</div>
+                      <div class="kb-info">
+                        <div class="kb-name" style="font-size:12.5px">${esc(d.name)}</div>
+                        <div class="kb-meta" style="color:var(--accent)">${d.date||'—'}</div><div class="kb-meta">${d.type||''} · ${d.chunks||0} chunks${d.builtin?' · Built-in':''}<span style="color:${d.supabase?'#22c55e':'#f59e0b'};margin-left:6px;font-size:10px">${d.supabase?'● Server':'⚠ Local only'}</span></div>
+                      </div>
+                      <div style="display:flex;gap:5px;flex-shrink:0">
+                        <button class="btn btn-ghost btn-sm" onclick="viewDoc('${d.id}')">👁</button>
+                        ${!d.builtin?`<button class="btn btn-danger btn-sm" onclick="deleteKBDoc('${d.id}')">✕</button>`:''}
+                      </div>
+                    </div>`).join('')}
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }).join('');
+
+  if(!el.innerHTML.trim()) el.innerHTML='<div class="empty-state"><p>No documents found</p></div>';
+}
+
+function toggleCat(header){
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+function toggleYear(header){
+  const arrow = header.querySelector('span');
+  arrow.textContent = arrow.textContent==='▶'?'▼':'▶';
+  header.nextElementSibling.classList.toggle('open');
+}
+
+// Update filterKB to also filter categories
+
+async function viewDoc(id){
+  const allDocs = [...BUILTIN_KB, ...adminDocs];
+  const doc = allDocs.find(d=>d.id===id);
+  if(!doc){ showToast('Document not found','error'); return; }
+  document.getElementById('dvTitle').textContent = doc.name;
+  document.getElementById('dvMeta').textContent = (doc.type||'Document') + ' · ' + (doc.date||'') + ' · ' + (doc.chunks||0) + ' chunks' + (doc.supabase?' · ● Server':'');
+  const body = document.getElementById('dvBody');
+  body.textContent = 'Loading...';
+  body.style.color = 'var(--text3)';
+  body.style.fontStyle = 'normal';
+  document.getElementById('docViewerModal').classList.add('show');
+
+  // Try local content first
+  let content = doc.content || doc.text || '';
+
+  // If not available locally and doc is on server — fetch first chunk
+  if((!content || content.length < 50) && doc.supabase && adminApiToken){
+    try{
+      const res = await fetch(API+'/kb/preview/'+doc.id, {
+        headers:{'Authorization':'Bearer '+adminApiToken}
+      });
+      if(res.ok){
+        const data = await res.json();
+        content = data.preview || '';
+        if(data.is_scanned){
+          body.innerHTML = '<div style="color:var(--red);margin-bottom:8px">⚠ Scanned PDF detected</div>' +
+            '<div style="color:var(--text3);font-style:italic;font-size:12px">This appears to be a scanned/image-based PDF. PDF.js cannot extract text from images. ' +
+            'The chunks stored may be empty or low-quality.<br><br>' +
+            'Please use a text-based PDF or run OCR on the document before uploading.</div>';
+          return;
+        }
+      }
+    }catch(e){ console.log('Preview fetch failed:', e.message); }
+  }
+
+  if(content && content.length > 50){
+    body.style.color = 'var(--text)';
+    body.innerHTML = esc(content.slice(0,5000) + (content.length>5000?'\n\n[Showing first 5000 chars...]':''))
+      .replace(/(circular\s*no\.?\s*[\d\/\-]+)/gi, '<mark style="background:var(--accent-light);color:var(--accent);padding:0 2px;border-radius:2px">$1</mark>')
+      .replace(/(notification\s*no\.?\s*[\d\/\-]+)/gi, '<mark style="background:#dbeafe;color:#1d4ed8;padding:0 2px;border-radius:2px">$1</mark>')
+      .replace(/(section\s+\d+[\w\(\)]*)/gi, '<mark style="background:#dcfce7;color:#166534;padding:0 2px;border-radius:2px">$1</mark>');
+  } else {
+    body.innerHTML = '<div style="color:var(--red);margin-bottom:8px">⚠ No text content found</div>' +
+      '<div style="color:var(--text3);font-style:italic;font-size:12px">This document appears to be a scanned/image-based PDF that cannot be read as text by PDF.js.<br><br>' +
+      'Consider: (1) Use a text-based PDF version, (2) Run OCR software first, (3) Delete this document and re-upload the correct version.</div>';
+  }
+}
+
+function closeDocViewer(){
+  document.getElementById('docViewerModal').classList.remove('show');
+}
+
+function renderKBList(filter=''){
+  const allDocs = [...BUILTIN_KB,...adminDocs].filter(d=>!filter||d.name.toLowerCase().includes(filter.toLowerCase()));
+  document.getElementById('kb-count-label').textContent = `${adminDocs.length} documents (${allDocs.length} total)`;
+  document.getElementById('kbTabCount-all').textContent = allDocs.length;
+  document.getElementById('kbTabCount-cat').textContent = allDocs.length;
+  document.getElementById('kbTabCount-skipped').textContent = skippedDocs.length;
+  if(skippedDocs.length>0) document.getElementById('kbTabCount-skipped').style.cssText='background:var(--red-bg);color:var(--red)';
+  const el = document.getElementById('kbDocList');
+  el.innerHTML = allDocs.map(d=>`
+    <div class="kb-item">
+      ${!d.builtin ? `<input type="checkbox" class="kb-select-chk" data-id="${d.id}" onchange="updateDeleteBtn()" style="flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--accent)"/>` : '<div style="width:15px;flex-shrink:0"></div>'}
+      <div class="kb-icon">${d.type?.includes('Circular')?'📋':d.type?.includes('Rules')?'📜':d.type?.includes('AAR')?'⚖':d.type?.includes('Notification')?'🔔':'📄'}</div>
+      <div class="kb-info">
+        <div class="kb-name">${esc(d.name)}</div>
+        <div class="kb-meta">${esc(d.type||'Document')} · <span style="color:var(--accent);font-weight:500">${d.date||'Date unknown'}</span> · ${d.chunks||0} chunks${d.docIdentity?.refNo?' · '+d.docIdentity.refNo.toUpperCase():''}
+          <span style="margin-left:8px;font-size:10px;font-weight:600;color:${d.supabase||d.builtin?'#22c55e':'#f59e0b'}">${d.builtin?'● Built-in':d.supabase?'● Server':'⚠ Local only'}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="viewDoc('${d.id}')">👁 View</button>
+        ${d.builtin
+          ? ''
+          : !d.supabase
+            ? `<button class="btn btn-sm" style="background:var(--accent);color:#fff;font-size:10px" onclick="reuploadDoc('${d.id}')">↑ Upload</button>
+               <button class="btn btn-danger btn-sm" onclick="deleteKBDoc('${d.id}')">Delete</button>`
+            : `<button class="btn btn-danger btn-sm" onclick="deleteKBDoc('${d.id}')">Delete</button>`
+        }
+      </div>
+    </div>`).join('');
+}
+
+function updateDeleteBtn(){
+  const checked = document.querySelectorAll('.kb-select-chk:checked').length;
+  const btn = document.getElementById('deleteSelectedBtn');
+  if(btn) btn.style.display = checked > 0 ? 'flex' : 'none';
+  if(btn) btn.textContent = `🗑 Delete Selected (${checked})`;
+}
+
+function deleteSelectedDocs(){
+  const checked = [...document.querySelectorAll('.kb-select-chk:checked')].map(c=>c.dataset.id);
+  if(!checked.length) return;
+  confirmAction(`Delete ${checked.length} selected document${checked.length>1?'s':''}?`, async ()=>{
+    if(adminApiToken){
+      for(const id of checked){
+        try{
+          await fetch(API+'/kb/documents/'+id,{
+            method:'DELETE',
+            headers:{'Authorization':'Bearer '+adminApiToken}
+          });
+        }catch(e){ console.error('Delete failed for',id,e); }
+      }
+    }
+    // Reload from server — confirms what was actually deleted
+    await checkKBSync();
+    showToast(`${checked.length} document${checked.length>1?'s':''} deleted ✓`,'success');
+    document.querySelectorAll('.kb-select-chk').forEach(c=>c.checked=false);
+    const btn=document.getElementById('deleteSelectedBtn');
+    if(btn){btn.style.display='none';}
+  });
+}
+
+function downloadKBZip(){
+  // Create a JSON export of all admin-added documents
+  if(!adminDocs.length){showToast('No custom documents to download','error');return;}
+  const exportData = {
+    exported_at: new Date().toISOString(),
+    total_documents: adminDocs.length,
+    documents: adminDocs.map(d=>({
+      name: d.name, type: d.type, date: d.date,
+      content: d.content || d.text || ''
+    }))
+  };
+  const json = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `GSTMind_KnowledgeBase_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  showToast(`Downloaded ${adminDocs.length} documents as JSON backup`,'success');
+}
+
+function filterKB(val){
+  renderKBList(val);
+  if(currentKBTab==='cat') renderKBCategories(val);
+}
+
+function addKBDocument(){
+  const name=document.getElementById('kb-doc-name').value.trim();
+  const type=document.getElementById('kb-doc-type').value;
+  const text=document.getElementById('kb-doc-text').value.trim();
+  if(!name||!text){showToast('Please fill document name and text','error');return;}
+  // Smart duplicate check — advisory only, not blocking
+  const dupe = isDuplicateContent(text, name);
+  if(dupe){
+    const proceed = confirm(`⚠ Possible duplicate detected\n\nReason: ${dupe.reason}\nMatches: "${dupe.name}"\n\nThis could be a different version or amendment of the same document.\n\nClick OK to add anyway, or Cancel to skip.`);
+    if(!proceed) return;
+  }
+  const words=text.split(/\s+/).filter(w=>w);
+  const chunks=Math.ceil(words.length/400);
+  const identity = extractDocIdentity(text);
+  const doc={id:'d'+Date.now(),name,type,text:text,content:text,chunks,date:new Date().toLocaleDateString('en-IN'),builtin:false,contentHash:fullContentHash(text),docIdentity:identity};
+  adminDocs.push(doc);
+  localStorage.setItem('gm_admin_kb',JSON.stringify(adminDocs));
+  document.getElementById('kb-doc-name').value='';
+  document.getElementById('kb-doc-text').value='';
+  renderKBList();refreshData();
+  showToast('Added: '+name,'success');
+}
+
+function onKBFileUpload(e){
+  const files = Array.from(e.target.files);
+  if(!files.length) return;
+  if(files.length === 1){
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const content = ev.target.result;
+      const meta = autoExtractDocMeta(content);
+      document.getElementById('kb-doc-name').value = meta.docName;
+      // Set document type dropdown
+      const typeEl = document.getElementById('kb-doc-type');
+      const opts = Array.from(typeEl.options).map(o=>o.value);
+      if(opts.includes(meta.docType)) typeEl.value = meta.docType;
+      document.getElementById('kb-doc-text').value = content;
+      showToast('✓ Auto-detected: ' + meta.docName + ' (' + meta.docType + ')','success');
+    };
+    reader.readAsText(files[0]);
+  } else {
+    // Multiple files — bulk add with dedup
+    let added=0, dupes=0, dupeNames=[];
+    let pending = files.length;
+    files.forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const name = file.name.replace(/\.[^.]+$/,'');
+        const content = ev.target.result;
+        // Smart content dedup check — for bulk, skip auto but report
+        const dupeResult = isDuplicateContent(content, name);
+        const isDupe = dupeResult !== null;
+        if(isDupe){
+          dupes++;
+          dupeNames.push(`${name} (similar to "${dupeResult.name}" — ${dupeResult.reason})`);
+        }
+        else {
+          const words = content.split(/\s+/).filter(w=>w);
+          const identity = extractDocIdentity(content);
+          adminDocs.push({
+            id:'d'+Date.now()+Math.random(),
+            name, type:'Uploaded File',
+            content, text:content,
+            chunks: Math.ceil(words.length/400),
+            date: new Date().toLocaleDateString('en-IN'),
+            builtin: false,
+            contentHash: fullContentHash(content),
+            docIdentity: identity
+          });
+          added++;
+        }
+        pending--;
+        if(pending === 0){
+          localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+          renderKBList(); refreshData();
+          let msg = `Added ${added} document${added!==1?'s':''}`;
+          if(dupes>0){
+            msg += ` · ${dupes} possible duplicate${dupes!==1?'s':''} skipped`;
+            showToast(msg, 'success');
+            // After a moment, offer to review skipped docs
+            setTimeout(()=>{
+              if(confirm(`${dupes} file${dupes>1?'s were':' was'} skipped as possible duplicate${dupes>1?'s':''}:\n\n${dupeNames.slice(0,5).join('\n')}${dupeNames.length>5?'\n...and '+(dupeNames.length-5)+' more':''}\n\nDo you want to add all skipped files anyway?`)){
+                // Re-read files from input is not possible after event — show instruction
+                alert('To add these files, please upload them individually using the single file upload option above. You will be prompted to confirm each one.');
+              }
+            }, 500);
+          } else {
+            showToast(msg, 'success');
+          }
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+  e.target.value='';
+}
+
+function deleteKBDoc(id){
+  const doc = adminDocs.find(d=>d.id===id);
+  const name = doc?.name || 'this document';
+  confirmAction(`Delete "${name.slice(0,60)}" from knowledge base?`, async ()=>{
+    if(doc?.supabase && adminApiToken){
+      try{
+        const res = await fetch(API+'/kb/documents/'+id,{
+          method:'DELETE',
+          headers:{'Authorization':'Bearer '+adminApiToken}
+        });
+        if(!res.ok){
+          const err = await res.json().catch(()=>({}));
+          showToast('Server delete failed: '+(err.detail||'Error'),'error');
+          return;
+        }
+      }catch(e){
+        showToast('Could not reach server','error');
+        return;
+      }
+    }
+    adminDocs = adminDocs.filter(d=>d.id!==id);
+    localStorage.setItem('gm_admin_kb', JSON.stringify(adminDocs));
+    renderKBList(); refreshData();
+    showToast('Document deleted ✓','success');
+    setTimeout(checkKBSync, 500);
+  });
+}
+
+function triggerSync(){
+  showToast('Sync triggered — backend required for live CBIC sync','success');
+  document.getElementById('last-sync').textContent='Just now (simulated)';
+}
+
+// ════════════════════════════════
+// SUBSCRIPTIONS
+// ════════════════════════════════
+function renderSubTable(){
+  const users=getAllUsers();
+  const tbody=document.getElementById('subTableBody');
+  if(!users.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><p>No subscribers yet.</p></div></td></tr>';return;}
+  tbody.innerHTML=users.map((u,i)=>`
+    <tr>
+      <td><strong>${esc(u.name||'Unknown')}</strong><div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${esc(u.email||u.phone||'—')}</div></td>
+      <td><span class="badge ${u.plan==='pro'?'badge-pro':u.plan==='unlimited'?'badge-unlimited':'badge-free'}">${u.plan==='pro'?'Professional':u.plan==='unlimited'?'Unlimited':'Free Trial'}</span></td>
+      <td style="font-family:'DM Mono',monospace">${u.queryCount||0} / ${u.plan==='unlimited'?'∞':(u.queryLimit||10)}</td>
+      <td style="font-size:11.5px;color:var(--text3);font-family:'DM Mono',monospace">${u.joinDate?new Date(u.joinDate).toLocaleDateString('en-IN'):'—'}</td>
+      <td><span class="badge ${u.blocked?'badge-blocked':'badge-active'}"><span class="badge-dot"></span>${u.blocked?'Blocked':'Active'}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openChangePlanSub(${i})">Change Plan</button></td>
+    </tr>`).join('');
+  currentUsers=users;
+}
+
+function openChangePlanSub(idx){ openChangePlan(idx); }
+
+function savePlanLimit(plan){
+  const limit=parseInt(document.getElementById('limit-'+plan).value);
+  if(!limit||limit<1){showToast('Invalid limit value','error');return;}
+  localStorage.setItem('gm_plan_limit_'+plan, limit);
+  showToast(`${plan} plan limit set to ${limit} queries/month`,'success');
+}
+
+// ════════════════════════════════
+// ANALYTICS
+// ════════════════════════════════
+const SAMPLE_QUERIES=[
+  'Time limit for ITC under Section 16(4)',
+  'GST on liquidated damages',
+  'Penalty for non-filing of GSTR-3B',
+  'ITC mismatch in GSTR-2A vs 3B',
+  'Place of supply for export of services',
+  'Zero-rated supply conditions under IGST',
+  'Rule 42 ITC reversal calculation',
+  'Section 73 demand limitation period',
+  'GSTR-9 annual return due date',
+  'RCM on legal services'
+];
+
+function renderAnalytics(){
+  const qEl=document.getElementById('top-queries-full');
+  const dEl=document.getElementById('top-queries-dash');
+
+  // Read real query log from localStorage (shared with user app)
+  const log = JSON.parse(localStorage.getItem('gm_query_log')||'{}');
+  const entries = Object.entries(log).sort((a,b)=>b[1]-a[1]);
+
+  if(entries.length > 0){
+    const maxCnt = entries[0][1] || 1;
+    const makeRows = (items) => items.map(([q,cnt])=>{
+      const pct = Math.round(cnt/maxCnt*100);
+      const short = q.length>52?q.slice(0,52)+'…':q;
+      return `<div class="bar-row">
+        <span class="bar-label" title="${esc(q)}">${esc(short)}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <span class="bar-count">${cnt}</span>
+      </div>`;
+    }).join('');
+    qEl.innerHTML = makeRows(entries.slice(0,10));
+    dEl.innerHTML = makeRows(entries.slice(0,5));
+  } else {
+    // Fall back to sample data labelled as sample
+    const sampleHtml = SAMPLE_QUERIES.slice(0,5).map((q,i)=>{
+      const cnt=Math.max(1,8-i);
+      const pct=Math.round(cnt/8*100);
+      return `<div class="bar-row"><span class="bar-label" style="color:var(--text3)">${esc(q)}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;opacity:.4"></div></div><span class="bar-count" style="color:var(--text3)">${cnt}</span></div>`;
+    }).join('');
+    const note = `<div style="font-size:11px;color:var(--text3);margin-bottom:10px;font-style:italic;padding:6px 0;border-bottom:1px solid var(--border)">Showing sample data — real query data appears here once users start using GSTMind.</div>`;
+    qEl.innerHTML = note + sampleHtml;
+    dEl.innerHTML = note + sampleHtml;
+  }
+}
+
+// ════════════════════════════════
+// SETTINGS
+// ════════════════════════════════
+function saveMasterKey(v){
+  localStorage.setItem('gm_master_key',v);
+  updateApiKeyStatus(v);
+}
+
+function updateApiKeyStatus(v){
+  const el=document.getElementById('api-key-status');
+  if(!el)return;
+  if(v&&v.startsWith('sk-')){
+    el.textContent='✓ API key set and active — all user queries will use this key';
+    el.style.background='var(--green-bg)';el.style.borderColor='var(--green-border)';el.style.color='var(--green)';
+  } else if(v){
+    el.textContent='✗ Key looks invalid — should start with sk-ant-';
+    el.style.background='var(--red-bg)';el.style.borderColor='var(--red-border)';el.style.color='var(--red)';
+  } else {
+    el.textContent='⚠ No key set — user queries will not work';
+    el.style.background='var(--accent-bg)';el.style.borderColor='var(--accent-border)';el.style.color='var(--accent)';
+  }
+}
+
+
+function resetAdminPassword(){
+  confirmAction('Reset admin password to default (gstmind@admin123)?', ()=>{
+    adminPass = 'gstmind@admin123';
+    localStorage.removeItem('gm_admin_pass');
+    showToast('Admin password reset to default','success');
+  });
+}
+
+function changeAdminPass(){
+  const curr=document.getElementById('stg-curr-pass').value;
+  const nw=document.getElementById('stg-new-pass').value;
+  const conf=document.getElementById('stg-conf-pass').value;
+  if(curr!==adminPass){showToast('Current password is incorrect','error');return;}
+  if(nw.length<8){showToast('New password must be at least 8 characters','error');return;}
+  if(nw!==conf){showToast('New passwords do not match','error');return;}
+  adminPass=nw;
+  localStorage.setItem('gm_admin_pass',nw);
+  document.getElementById('stg-curr-pass').value='';
+  document.getElementById('stg-new-pass').value='';
+  document.getElementById('stg-conf-pass').value='';
+  showToast('Admin password updated successfully','success');
+}
+
+function resetQueryCounts(){
+  const users=getAllUsers();
+  users.forEach(u=>{u.queryCount=0;});
+  saveAllUsers(users);renderUserTable(getAllUsers());refreshData();
+}
+
+function clearAllUsers(){
+  localStorage.removeItem('gm_users');
+  localStorage.removeItem('gm_user');
+  renderUserTable([]);refreshData();
+}
+
+// ════════════════════════════════
+// CONFIRM
+// ════════════════════════════════
+function confirmAction(msg, cb){
+  document.getElementById('confirm-msg').textContent=msg;
+  const btn=document.getElementById('confirm-ok-btn');
+  btn.onclick=async ()=>{
+    document.getElementById('confirmModal').classList.remove('show');
+    await cb(); // await async callbacks properly
+  };
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+// ════════════════════════════════
+// TOAST
+// ════════════════════════════════
+function showToast(msg, type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+
+
+// ── AI PROMPT MANAGEMENT ──
+const DEFAULT_PROMPTS = {
+  query: `You are GSTMind, an expert AI legal research assistant for Indian GST law, assisting Chartered Accountants and tax professionals. Write in an authoritative, professional tone.
+
+STRICT RULES:
+1. Answer ONLY from the KNOWLEDGE BASE provided. If not found, state clearly that it is not in the uploaded documents.
+2. Use footnote-style citations with superscript numbers inline and list sources under REFERENCES at the end.
+3. Confidence: HIGH = directly from Act/Rule/Notification | MEDIUM = from Circular/FAQ/AAR | LOW = interpretive
+4. Never infer or guess beyond provided documents.
+5. Cite exact section numbers (e.g. Section 16(2)(b) of CGST Act, 2017).
+6. Structure: Legal Position → Applicable Provision → Conditions/Exceptions → Practical Implication → Conclusion
+
+OUTPUT FORMAT:
+CONFIDENCE: [HIGH/MEDIUM/LOW]
+ANSWER:
+[Professional paragraphs with superscript footnotes]
+REFERENCES:
+1. [Document] — [Section]`,
+  draft: `You are GSTMind, helping a Chartered Accountant draft a formal reply to a GST notice.
+
+STEP 1 — IDENTIFY THE NOTICE TYPE from the text or document provided.
+STEP 2 — DRAFT A FORMAL REPLY structured as a legal letter with numbered submissions and superscript citations.
+
+RULES: Draft ONLY from KNOWLEDGE BASE. Formal legal language. Superscript footnotes inline. Flag unverified arguments. End with disclaimer starting with ⚠.
+
+OUTPUT FORMAT:
+NOTICE TYPE IDENTIFIED: [Type]
+CONFIDENCE: [HIGH/MEDIUM/LOW]
+DRAFT REPLY:
+[Full formal letter]
+REFERENCES:
+1. [Document] — [Section]`
+};
+
+function loadPrompts(){
+  const qEl = document.getElementById('stg-prompt-query');
+  const dEl = document.getElementById('stg-prompt-draft');
+  if(qEl) qEl.value = localStorage.getItem('gm_prompt_query') || DEFAULT_PROMPTS.query;
+  if(dEl) dEl.value = localStorage.getItem('gm_prompt_draft') || DEFAULT_PROMPTS.draft;
+}
+
+function savePrompt(type){
+  const val = document.getElementById('stg-prompt-'+type).value.trim();
+  if(!val){showToast('Prompt cannot be empty','error');return;}
+  localStorage.setItem('gm_prompt_'+type, val);
+  showToast(type==='query'?'Query instructions saved':'Draft instructions saved','success');
+}
+
+function saveDisclaimer(){
+  const val = document.getElementById('stg-disclaimer').value.trim();
+  localStorage.setItem('gm_disclaimer', val);
+  showToast('Disclaimer saved','success');
+}
+
+function toggleAdminTheme(){
+  document.body.classList.toggle('light-mode');
+  const isLight = document.body.classList.contains('light-mode');
+  localStorage.setItem('gm_admin_theme', isLight ? 'light' : 'dark');
+  document.getElementById('adminThemeBtn').textContent = isLight ? '🌙 Dark' : '☀️ Light';
+}
+function loadAdminTheme(){
+  const saved = localStorage.getItem('gm_admin_theme');
+  if(saved === 'light'){
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('adminThemeBtn');
+    if(btn) btn.textContent = '🌙 Dark';
+  }
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
